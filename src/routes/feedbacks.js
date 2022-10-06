@@ -1,9 +1,15 @@
 //CRUD Operations
 const router = require("express").Router();
-const userController = require("../controllers/feedbackController");
+const feedbackController = require("../controllers/feedbackController");
 
-router.get("/", (req, res) => {
-  res.send("Feedback route");
-});
+router.post("/create", feedbackController.createFeedback);
+
+router.put("/update/:id", feedbackController.updateFeedback);
+
+router.delete("/delete/:id", feedbackController.deleteFeedback);
+
+router.get("/:id", feedbackController.getFeedback);
+
+router.get("comments/:id", feedbackController.getAllFeedbacksByRouteOrAreaID);
 
 module.exports = router;

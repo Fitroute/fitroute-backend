@@ -9,9 +9,13 @@ const Schema = mongoose.Schema(
       type: String,
       required: false,
     },
+    routeId: {
+      type: String,
+      required: true,
+    },
     score: {
       type: Number,
-      required: false,
+      required: true,
     },
     displayName: {
       type: Boolean,
