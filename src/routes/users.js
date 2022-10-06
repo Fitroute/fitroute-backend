@@ -7,11 +7,8 @@ router.get("/", (req, res) => {
 });
 
 router.post("/register", userController.register);
-
 router.post("/login", userController.login);
-
 router.get("/bmi/:id", userController.bmi);
-
 router.put("/update/:id", userController.updateUser);
 
 module.exports = router;

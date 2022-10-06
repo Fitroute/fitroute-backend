@@ -25,10 +25,6 @@ const Schema = mongoose.Schema(
       type: String,
       required: true,
     },
-    comments: {
-      type: Array,
-      required: false,
-    },
   },
   { timestamps: true, versionKey: false }
 );
