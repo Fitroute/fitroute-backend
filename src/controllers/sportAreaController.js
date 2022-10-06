@@ -6,7 +6,6 @@ const Area = require("../models/sportAreaModel");
 //description
 //location
 //images - not required
-//comments - not required
 
 const getAllAreas = async (req, res) => {
   try {
