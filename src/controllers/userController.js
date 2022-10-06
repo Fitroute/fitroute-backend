@@ -19,43 +19,73 @@ const bcrypt = require("bcrypt");
 // };
 
 const bmi = async (req, res) => {
-  const { weight, height, age, id } = req.body;
-  const user = await User.findById(id);
-  user.weight = weight;
-  user.height = height;
-  user.age = age;
-  await user.save();
+  const user = await User.findById(req.params.id);
   try {
-    const bmi = weight / (height * height);
+    const bmi = user.weight / Math.pow(user.height, 2);
     let bmiStatus = "Not Calculated";
-    if (age > 20) {
-      switch (true) {
-        case bmi < 16.0:
-          bmiStatus = "Severely Underweight";
-          break;
-        case bmi < 18.5:
-          bmiStatus = "Underweight";
-          break;
-        case bmi < 25.0:
-          bmiStatus = "Normal";
-          break;
-        case bmi < 30.0:
-          bmiStatus = "Overweight";
-          break;
-        case bmi < 35.0:
-          bmiStatus = "Moderately Obese";
-          break;
-        case bmi < 40.0:
-          bmiStatus = "Severely Obese";
-          break;
-        case bmi > 40.0:
-          bmiStatus = "Morbidly Obese";
-          break;
-      }
+    switch (true) {
+      case bmi < 16.0:
+        bmiStatus = "Severely Underweight";
+        break;
+      case bmi < 18.5:
+        bmiStatus = "Underweight";
+        break;
+      case bmi < 25.0:
+        bmiStatus = "Normal";
+        break;
+      case bmi < 30.0:
+        bmiStatus = "Overweight";
+        break;
+      case bmi < 35.0:
+        bmiStatus = "Moderately Obese";
+        break;
+      case bmi < 40.0:
+        bmiStatus = "Severely Obese";
+        break;
+      case bmi > 40.0:
+        bmiStatus = "Morbidly Obese";
+        break;
     }
     res.status(200).json({
       message: bmiStatus,
       bmi,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: "An error occurred",
+      error: error.message,
+    });
+  }
+};
+
+const updateUser = async (req, res) => {
+  const {
+    name,
+    surname,
+    email,
+    password,
+    country,
+    city,
+    weight,
+    height,
+    image,
+  } = req.body;
+  try {
+    await User.findByIdAndUpdate(req.params.id, {
+      name,
+      surname,
+      email,
+      password,
+      country,
+      city,
+      weight,
+      height,
+      image,
+    }).then((user) => {
+      res.status(200).json({
+        message: "User updated successfully",
+        user,
+      });
     });
   } catch (error) {
     res.status(400).json({
@@ -113,4 +143,4 @@ const login = async (req, res) => {
     });
   }
 };
-module.exports = { register, login, bmi };
+module.exports = { register, login, bmi, updateUser };
