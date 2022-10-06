@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 app.use("/users", usersRouter);
 
 // //PathRoutes Route
-app.use("/routes", pathRoutesRouter);
+app.use("/pathRoutes", pathRoutesRouter);
 
 // //SportAreas Route
 app.use("/sportAreas", sportAreasRouter);

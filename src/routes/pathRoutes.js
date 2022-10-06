@@ -1,9 +1,12 @@
 //CRUD Operations
 const router = require("express").Router();
-const userController = require("../controllers/pathRouteController");
+const pathRouteController = require("../controllers/pathRouteController");
 
-router.get("/", (req, res) => {
-  res.send("PathRoute route");
-});
+router.post("/create", pathRouteController.createPathRoute);
+router.put("/update/:id", pathRouteController.updatePathRoute);
+router.delete("/delete/:id", pathRouteController.deletePathRoute);
+router.get("/:id", pathRouteController.getPathRoute);
+router.get("/filter/:category", pathRouteController.getPathRoutesByCategory);
+router.get("/routes/:id", pathRouteController.getAllPathRoutesByCreatedBy);
 
 module.exports = router;

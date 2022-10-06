@@ -41,10 +41,6 @@ const Schema = mongoose.Schema(
       type: Array,
       required: false,
     },
-    comments: {
-      type: Array,
-      required: true,
-    },
   },
   { timestamps: true, versionKey: false }
 );
