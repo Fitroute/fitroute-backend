@@ -1,9 +1,11 @@
 //CRUD Operations
 const router = require("express").Router();
-const userController = require("../controllers/postController");
+const postController = require("../controllers/postController");
 
-router.get("/", (req, res) => {
-  res.send("Post route");
-});
+router.get("/", postController.getAllPosts);
+router.get("/:id", postController.getPost);
+router.post("/create", postController.createPost);
+router.put("/update/:id", postController.updatePost);
+router.delete("/delete/:id", postController.deletePost);
 
 module.exports = router;
