@@ -10,6 +10,8 @@ router.post("/register", userController.register);
 
 router.post("/login", userController.login);
 
-router.post("/bmi", userController.bmi);
+router.get("/bmi/:id", userController.bmi);
+
+router.put("/update/:id", userController.updateUser);
 
 module.exports = router;
