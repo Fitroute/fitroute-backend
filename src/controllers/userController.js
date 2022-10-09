@@ -1,5 +1,7 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const status = require("http-status");
 
 // const uploadUserImage = async (req, res) => {
 //   try {
@@ -46,12 +48,12 @@ const bmi = async (req, res) => {
         bmiStatus = "Morbidly Obese";
         break;
     }
-    res.status(200).json({
+    res.status(status.OK).json({
       message: bmiStatus,
       bmi,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(status.INTERNAL_SERVER_ERROR).json({
       message: "An error occurred",
       error: error.message,
     });
@@ -59,59 +61,62 @@ const bmi = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const {
-    name,
-    surname,
-    email,
-    password,
-    country,
-    city,
-    weight,
-    height,
-    image,
-  } = req.body;
   try {
-    await User.findByIdAndUpdate(req.params.id, {
-      name,
-      surname,
-      email,
-      password,
-      country,
-      city,
-      weight,
-      height,
-      image,
-    }).then((user) => {
-      res.status(200).json({
-        message: "User updated successfully",
-        user,
+    const request = req.body;
+    await User.findByIdAndUpdate(req.params.id, request)
+      .then((user) => {
+        res
+          .status(status.OK)
+          .json({ message: "User updated successfully", user });
+      })
+      .catch((err) => {
+        res.status(status.BAD_REQUEST).json("Error: " + err);
       });
-    });
   } catch (error) {
-    res.status(400).json({
-      message: "An error occurred",
-      error: error.message,
-    });
+    res.status(status.INTERNAL_SERVER_ERROR).json({ message: error.message });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    await User.findByIdDelete(req.params.id)
+      .then((user) => {
+        res
+          .status(status.OK)
+          .json({ message: "User deleted successfully", user });
+      })
+      .catch((err) => {
+        res.status(status.BAD_REQUEST).json("Error: " + err);
+      });
+  } catch (error) {
+    res.status(status.INTERNAL_SERVER_ERROR).json({ message: error.message });
   }
 };
 
 const register = async (req, res) => {
   const { name, surname, email, password, country, city } = req.body;
-  //Password Hashing
-  const salt = bcrypt.genSaltSync(10);
-  const hash = bcrypt.hashSync(req.body.password, salt);
-  //Create User
-  const user = new User({ ...req.body, password: hash });
+  let user = await User.findOne({ email });
+  if (user) {
+    res.status(status.BAD_REQUEST).json({
+      message: "Registration failed",
+      error: "Email already exists",
+    });
+    return;
+  }
   try {
+    //Password Hashing
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(req.body.password, salt);
+    //Create User
+    const user = new User({ ...req.body, password: hash });
     user.save().then(() => {
-      res.status(200).json({
+      res.status(status.CREATED).json({
         message: "User created successfully",
-        user,
       });
     });
   } catch (error) {
-    res.status(401).json({
-      message: "User not successful created",
+    res.status(status.BAD_REQUEST).json({
+      message: "An error occurred",
       error: error.message,
     });
   }
@@ -125,22 +130,38 @@ const login = async (req, res) => {
       // Checks users password
       const isValid = bcrypt.compareSync(password, user.password);
       if (!user || !isValid) {
-        res.status(401).json({
+        res.status(status.BAD_REQUEST).json({
           message: "Login failed",
           error: "Email or password is wrong",
         });
         return;
       }
-      res.status(200).json({
+      //Create token
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+      res.header("Authorization", token).status(status.OK).json({
         message: "User logged in successfully",
-        user,
+        accessToken: token,
       });
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(status.INTERNAL_SERVER_ERROR).json({
       message: "An error occurred",
       error: error.message,
     });
   }
 };
-module.exports = { register, login, bmi, updateUser };
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(status.OK).json({
+      message: "Users retrieved successfully",
+      users,
+    });
+  } catch (error) {
+    res.status(status.INTERNAL_SERVER_ERROR).json({
+      message: "An error occurred",
+      error: error.message,
+    });
+  }
+};
+module.exports = { register, login, bmi, getAllUsers, updateUser, deleteUser };
