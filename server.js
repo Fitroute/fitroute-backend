@@ -3,14 +3,13 @@ require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-// //Import Routes
+//Import Routes
 require("./src/config/db");
 const usersRouter = require("./src/routes/users");
 const pathRoutesRouter = require("./src/routes/pathRoutes");
 const sportAreasRouter = require("./src/routes/sportAreas");
 const postsRouter = require("./src/routes/posts");
 const feedbacksRouter = require("./src/routes/feedbacks");
-
 //Middleware
 app.use(bodyParser.json());
 // Cors policy hatasını çözer
@@ -21,19 +20,19 @@ app.get("/", (req, res) => {
   res.send("Welcome to fitroute-backend 👋!");
 });
 
-// //Users Route
+//Users Route
 app.use("/users", usersRouter);
 
-// //PathRoutes Route
+//PathRoutes Route
 app.use("/pathRoutes", pathRoutesRouter);
 
-// //SportAreas Route
+//SportAreas Route
 app.use("/sportAreas", sportAreasRouter);
 
-// //Posts Route
+//Posts Route
 app.use("/posts", postsRouter);
 
-// //Feedbacks Route
+//Feedbacks Route
 app.use("/feedbacks", feedbacksRouter);
 
 module.exports = app;

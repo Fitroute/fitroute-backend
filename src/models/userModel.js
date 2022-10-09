@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const logger = require("../loggers/user");
 const Schema = mongoose.Schema(
   {
     city: {
@@ -44,5 +45,14 @@ const Schema = mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
+//Logger için mongoose hooks kullanıldı.
+// Schema.pre("save", (next, doc) => {
+//   console.log("Önceki durum: ", doc);
+//   next();
+// });
+
+Schema.post("save", (doc) => {
+  logger.log({ level: "info", message: doc });
+});
 
 module.exports = mongoose.model("users", Schema);
