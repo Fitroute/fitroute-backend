@@ -26,8 +26,8 @@ const Schema = mongoose.Schema(
       required: true,
     },
     createdBy: {
-      type: String,
-      required: true,
+      type: mongoose.Types.ObjectId,
+      ref: "users",
     },
     isPrivate: {
       type: Boolean,

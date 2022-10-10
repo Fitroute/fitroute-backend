@@ -1,4 +1,5 @@
-const Post = require("../models/postModel");
+const httpStatus = require("http-status");
+const { insert, list, update, removePost } = require("../services/postService");
 
 //createdBy - user id
 //title
@@ -6,82 +7,69 @@ const Post = require("../models/postModel");
 //image - not required
 
 const getAllPosts = async (req, res) => {
-  try {
-    await Post.find()
-      .then((posts) => {
-        res.status(201).json(posts);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
+  await list()
+    .then((posts) => {
+      res.status(httpStatus.OK).json({
+        message: "Posts fetched successfully",
+        length: posts.length,
+        posts,
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const getPost = async (req, res) => {
-  try {
-    await Post.find({ createdBy: req.params.id })
-      .then((posts) => {
-        res.status(201).json(posts);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
-      });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+    });
 };
 
 const createPost = async (req, res) => {
-  try {
-    const request = req.body;
-    const post = new Post(request);
-    await post
-      .save()
-      .then((post) => {
-        res.status(201).json(post);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
+  req.body.createdBy = req.user;
+  await insert(req.body)
+    .then((post) => {
+      res.status(httpStatus.CREATED).json({
+        message: "Post created successfully",
+        post,
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+    });
 };
 
 const updatePost = async (req, res) => {
-  try {
-    const request = req.body;
-    await Post.findByIdAndUpdate(req.params.id, request)
+  if (!req.params.id) {
+    res.status(400).json({
+      message: "Post id is required",
+    });
+  } else {
+    await update(req.params.id, req.body)
       .then((post) => {
-        res.status(201).json({
+        res.status(httpStatus.OK).json({
           message: "Post updated successfully",
           post,
         });
       })
       .catch((err) => {
-        res.status(400).json("Error: " + err);
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 };
 
 const deletePost = async (req, res) => {
-  try {
-    await Post.findByIdAndDelete(req.params.id)
-      .then(() => {
-        res.status(201).json({
+  if (!req.params.id) {
+    res.status(400).json({
+      message: "Post id is required",
+    });
+  } else {
+    await removePost
+      .then((post) => {
+        res.status(httpStatus.OK).json({
           message: "Post deleted successfully",
+          post,
         });
       })
       .catch((err) => {
-        res.status(400).json("Error: " + err);
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { createPost, getPost, getAllPosts, updatePost, deletePost };
+module.exports = { createPost, getAllPosts, updatePost, deletePost };

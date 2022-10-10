@@ -1,7 +1,20 @@
-const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const status = require("http-status");
+const {
+  insert,
+  loginUser,
+  list,
+  update,
+  removeUser,
+} = require("../services/userService");
+
+const postService = require("../services/postService");
+const areaService = require("../services/sportAreaService");
+const pathService = require("../services/pathRouteService");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../utils/helper");
 
 // const uploadUserImage = async (req, res) => {
 //   try {
@@ -20,116 +33,108 @@ const status = require("http-status");
 //   }
 // };
 
-const bmi = async (req, res) => {
-  const user = await User.findById(req.params.id);
-  try {
-    const bmi = user.weight / Math.pow(user.height, 2);
-    let bmiStatus = "Not Calculated";
-    switch (true) {
-      case bmi < 16.0:
-        bmiStatus = "Severely Underweight";
-        break;
-      case bmi < 18.5:
-        bmiStatus = "Underweight";
-        break;
-      case bmi < 25.0:
-        bmiStatus = "Normal";
-        break;
-      case bmi < 30.0:
-        bmiStatus = "Overweight";
-        break;
-      case bmi < 35.0:
-        bmiStatus = "Moderately Obese";
-        break;
-      case bmi < 40.0:
-        bmiStatus = "Severely Obese";
-        break;
-      case bmi > 40.0:
-        bmiStatus = "Morbidly Obese";
-        break;
-    }
-    res.status(status.OK).json({
-      message: bmiStatus,
-      bmi,
+const getBMI = async (req, res) => {
+  list({ _id: req.user?._id })
+    .then((user) => {
+      const bmi = user[0].weight / (user[0].height * user[0].height);
+      let bmiStatus = "Not Calculated";
+      switch (true) {
+        case bmi < 16.0:
+          bmiStatus = "Severely Underweight";
+          break;
+        case bmi < 18.5:
+          bmiStatus = "Underweight";
+          break;
+        case bmi < 25.0:
+          bmiStatus = "Normal";
+          break;
+        case bmi < 30.0:
+          bmiStatus = "Overweight";
+          break;
+        case bmi < 35.0:
+          bmiStatus = "Moderately Obese";
+          break;
+        case bmi < 40.0:
+          bmiStatus = "Severely Obese";
+          break;
+        case bmi > 40.0:
+          bmiStatus = "Morbidly Obese";
+          break;
+      }
+      res.status(status.OK).json({
+        message: bmiStatus,
+        bmi,
+      });
+    })
+    .catch((e) => {
+      res.status(status.INTERNAL_SERVER_ERROR).json({
+        message: "An error occurred",
+        error: e.message,
+      });
     });
-  } catch (error) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({
-      message: "An error occurred",
-      error: error.message,
-    });
-  }
 };
 
 const updateUser = async (req, res) => {
-  try {
-    const request = req.body;
-    await User.findByIdAndUpdate(req.params.id, request)
-      .then((user) => {
-        res
-          .status(status.OK)
-          .json({ message: "User updated successfully", user });
-      })
-      .catch((err) => {
-        res.status(status.BAD_REQUEST).json("Error: " + err);
-      });
-  } catch (error) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({ message: error.message });
-  }
+  await update(req.user?._id, req.body)
+    .then((user) => {
+      res
+        .status(status.OK)
+        .json({ message: "User updated successfully", user });
+    })
+    .catch((e) => {
+      res.status(status.BAD_REQUEST).json("Error: " + e);
+    });
 };
 
 const deleteUser = async (req, res) => {
-  try {
-    await User.findByIdDelete(req.params.id)
-      .then((user) => {
-        res
-          .status(status.OK)
-          .json({ message: "User deleted successfully", user });
-      })
-      .catch((err) => {
-        res.status(status.BAD_REQUEST).json("Error: " + err);
-      });
-  } catch (error) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({ message: error.message });
-  }
+  await removeUser(req.user?._id)
+    .then((user) => {
+      res
+        .status(status.OK)
+        .json({ message: "User deleted successfully", user });
+    })
+    .catch((e) => {
+      res.status(status.BAD_REQUEST).json("Error: " + err);
+    });
 };
 
 const register = async (req, res) => {
-  const { name, surname, email, password, country, city } = req.body;
-  let user = await User.findOne({ email });
-  if (user) {
-    res.status(status.BAD_REQUEST).json({
-      message: "Registration failed",
-      error: "Email already exists",
-    });
-    return;
-  }
-  try {
-    //Password Hashing
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(req.body.password, salt);
-    //Create User
-    const user = new User({ ...req.body, password: hash });
-    user.save().then(() => {
-      res.status(status.CREATED).json({
-        message: "User created successfully",
+  await User.findOne({ email: req.body.email }).then((user) => {
+    if (user) {
+      res.status(status.BAD_REQUEST).json({
+        message: "Registration failed",
+        error: "Email already exists",
       });
-    });
-  } catch (error) {
-    res.status(status.BAD_REQUEST).json({
-      message: "An error occurred",
-      error: error.message,
-    });
-  }
+      return;
+    } else {
+      //Password Hashing
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(req.body.password, salt);
+      req.body.password = hash;
+      insert(req.body)
+        .then((response) => {
+          res.status(status.CREATED).json({
+            message: "User registered successfully",
+            user: response,
+          });
+        })
+        .catch((e) => {
+          res.status(status.INTERNAL_SERVER_ERROR).json({
+            message: "An error occurred",
+            error: e.message,
+          });
+        });
+    }
+  });
 };
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  try {
-    //Find user by email
-    await User.findOne({ email }).then((user) => {
+  await loginUser(email)
+    .then((user) => {
       // Checks users password
       const isValid = bcrypt.compareSync(password, user.password);
-      if (!user || !isValid) {
+      if (!isValid) {
         res.status(status.BAD_REQUEST).json({
           message: "Login failed",
           error: "Email or password is wrong",
@@ -137,31 +142,96 @@ const login = async (req, res) => {
         return;
       }
       //Create token
-      const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-      res.header("Authorization", token).status(status.OK).json({
+      user = {
+        ...user.toObject(),
+        token: {
+          accessToken: generateAccessToken(user),
+          refreshToken: generateRefreshToken(user),
+        },
+      };
+      delete user.password;
+      res.status(status.OK).json({
         message: "User logged in successfully",
-        accessToken: token,
+        user,
+      });
+    })
+    .catch((e) => {
+      res.status(status.BAD_REQUEST).json({
+        message: "Login failed",
+        error: "Email or password is wrong",
       });
     });
-  } catch (error) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({
-      message: "An error occurred",
-      error: error.message,
-    });
-  }
 };
+
 const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(status.OK).json({
-      message: "Users retrieved successfully",
-      users,
+  await list()
+    .select("-password")
+    .then((users) => {
+      res.status(status.OK).json({
+        message: "Users retrieved successfully",
+        length: users.length,
+        users,
+      });
+    })
+    .catch((e) => {
+      res.status(status.INTERNAL_SERVER_ERROR).json({
+        message: "An error occurred",
+        error: e.message,
+      });
     });
-  } catch (error) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({
-      message: "An error occurred",
-      error: error.message,
-    });
-  }
 };
-module.exports = { register, login, bmi, getAllUsers, updateUser, deleteUser };
+
+const getPostList = async (req, res) => {
+  postService
+    .list({ createdBy: req.user?._id })
+    .then((posts) => {
+      res.status(status.OK).json(posts);
+    })
+    .catch((e) => {
+      res.status(status.INTERNAL_SERVER_ERROR).json({
+        message: "An error occurred",
+        error: e.message,
+      });
+    });
+};
+
+const getAreaList = async (req, res) => {
+  areaService
+    .list({ createdBy: req.user?._id })
+    .then((areas) => {
+      res.status(status.OK).json(areas);
+    })
+    .catch((e) => {
+      res.status(status.INTERNAL_SERVER_ERROR).json({
+        message: "An error occurred",
+        error: e.message,
+      });
+    });
+};
+
+// Get All PathRoute by CreatedBy
+const getAllPathRoutesByCreatedBy = async (req, res) => {
+  pathRouteService
+    .list({ createdBy: req.user?._id })
+    .then((pathRoutes) => {
+      res.status(status.OK).json(pathRoutes);
+    })
+    .catch((e) => {
+      res.status(status.INTERNAL_SERVER_ERROR).json({
+        message: "An error occurred",
+        error: e.message,
+      });
+    });
+};
+
+module.exports = {
+  register,
+  login,
+  getBMI,
+  getAllUsers,
+  getPostList,
+  getAreaList,
+  getAllPathRoutesByCreatedBy,
+  updateUser,
+  deleteUser,
+};
