@@ -1,8 +1,8 @@
 //CRUD Operations
 const router = require("express").Router();
 const userController = require("../controllers/userController");
-const verifyToken = require("../middlewares/verifyToken");
 const validate = require("../middlewares/validate");
+const verifyToken = require("../middlewares/verifyToken");
 const schemas = require("../validations/user");
 
 router.get("/", userController.getAllUsers);
@@ -12,8 +12,12 @@ router
 router
   .route("/login")
   .post(validate(schemas.loginValidation), userController.login);
-router.get("/bmi/:id", userController.bmi);
-router.put("/update/:id", userController.updateUser);
-router.delete("/delete/:id", userController.deleteUser);
-
+router.route("/posts").get(verifyToken, userController.getPostList);
+router.route("/areas").get(verifyToken, userController.getAreaList);
+router
+  .route("/pathRoutes")
+  .get(verifyToken, userController.getAllPathRoutesByCreatedBy);
+router.route("/bmi").get(verifyToken, userController.getBMI);
+router.route("/update").patch(verifyToken, userController.updateUser);
+router.route("/delete").delete(verifyToken, userController.deleteUser);
 module.exports = router;

@@ -1,7 +1,8 @@
-const app = require("express")();
+const express = require("express");
+const app = express();
 require("dotenv").config();
-const bodyParser = require("body-parser");
 const cors = require("cors");
+const helmet = require("helmet");
 
 //Import Routes
 require("./src/config/db");
@@ -11,9 +12,11 @@ const sportAreasRouter = require("./src/routes/sportAreas");
 const postsRouter = require("./src/routes/posts");
 const feedbacksRouter = require("./src/routes/feedbacks");
 //Middleware
-app.use(bodyParser.json());
+app.use(express.json());
 // Cors policy hatasını çözer
 app.use(cors());
+// Helmet paketi ile güvenlik önlemleri alınır
+app.use(helmet());
 
 //Main Route
 app.get("/", (req, res) => {

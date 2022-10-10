@@ -1,12 +1,14 @@
 //CRUD Operations
 const router = require("express").Router();
 const sportAreaController = require("../controllers/sportAreaController");
+const verifyToken = require("../middlewares/verifyToken");
 
-router.get("/", sportAreaController.getAllAreas);
-router.get("/:id", sportAreaController.getArea);
-router.get("/filter/:category", sportAreaController.getAreasByCategory);
-router.post("/create", sportAreaController.createArea);
-router.put("/update/:id", sportAreaController.updateArea);
-router.delete("/delete/:id", sportAreaController.deleteArea);
+router.route("/").get(sportAreaController.getAllAreas);
+router
+  .route("/:category")
+  .get(verifyToken, sportAreaController.getAreasByCategory);
+router.route("/create").post(verifyToken, sportAreaController.createArea);
+router.route("/update/:id").patch(verifyToken, sportAreaController.updateArea);
+router.route("/delete/:id").delete(verifyToken, sportAreaController.deleteArea);
 
 module.exports = router;

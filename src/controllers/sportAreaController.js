@@ -1,4 +1,10 @@
-const Area = require("../models/sportAreaModel");
+const httpStatus = require("http-status");
+const {
+  insert,
+  list,
+  update,
+  removeArea,
+} = require("../services/sportAreaService");
 
 //createdBy - user id
 //name
@@ -8,98 +14,90 @@ const Area = require("../models/sportAreaModel");
 //images - not required
 
 const getAllAreas = async (req, res) => {
-  try {
-    await Area.find()
-      .then((areas) => {
-        res.status(200).json(areas);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
+  await list()
+    .then((areas) => {
+      res.status(httpStatus.OK).json({
+        message: "Areas fetched successfully",
+        areas,
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Error while fetching areas",
+        error: err,
+      });
+    });
 };
 
 const getAreasByCategory = async (req, res) => {
-  try {
-    await Area.find({ category: req.params.category })
-      .then((areas) => {
-        res.status(200).json(areas);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
+  await list({ category: req.params.category })
+    .then((areas) => {
+      res.status(httpStatus.OK).json({
+        message: "Areas fetched successfully",
+        areas,
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const getArea = async (req, res) => {
-  try {
-    await Area.find({ createdBy: req.params.id })
-      .then((areas) => {
-        res.status(200).json(areas);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Error while fetching areas",
+        error: err,
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    });
 };
 
 const createArea = async (req, res) => {
-  try {
-    const request = req.body;
-    const area = new Area(request);
-    await area
-      .save()
-      .then((area) => {
-        res.status(201).json(area);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
+  req.body.createdBy = req.user;
+  await insert(req.body)
+    .then((area) => {
+      res.status(httpStatus.CREATED).json({
+        message: "Area created successfully",
+        area,
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Error while creating area",
+        error: err,
+      });
+    });
 };
 
 const updateArea = async (req, res) => {
-  try {
-    const request = req.body;
-    await Area.findByIdAndUpdate(req.params.id, request)
-      .then((area) => {
-        res.status(200).json(area);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
+  await update(req.params.id, req.body)
+    .then((area) => {
+      res.status(httpStatus.OK).json({
+        message: "Area updated successfully",
+        area,
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Error while updating area",
+        error: err,
+      });
+    });
 };
 
 const deleteArea = async (req, res) => {
-  try {
-    await Area.findByIdAndDelete(req.params.id)
-      .then((area) => {
-        res.status(200).json(area);
-      })
-      .catch((err) => {
-        res.status(400).json("Error: " + err);
+  await removeArea(req.params.id)
+    .then((area) => {
+      res.status(httpStatus.OK).json({
+        message: "Area deleted successfully",
+        area,
       });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Error while deleting area",
+        error: err,
+      });
+    });
 };
 
 module.exports = {
   createArea,
   getAllAreas,
   getAreasByCategory,
-  getArea,
   updateArea,
   deleteArea,
 };

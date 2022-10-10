@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema(
   {
     createdBy: {
-      type: String,
-      required: true,
+      type: mongoose.Types.ObjectId,
+      ref: "users",
     },
     text: {
       type: String,

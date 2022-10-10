@@ -1,12 +1,18 @@
 //CRUD Operations
 const router = require("express").Router();
 const pathRouteController = require("../controllers/pathRouteController");
+const verifyToken = require("../middlewares/verifyToken");
 
-router.post("/create", pathRouteController.createPathRoute);
-router.put("/update/:id", pathRouteController.updatePathRoute);
-router.delete("/delete/:id", pathRouteController.deletePathRoute);
-router.get("/:id", pathRouteController.getPathRoute);
-router.get("/filter/:category", pathRouteController.getPathRoutesByCategory);
-router.get("/routes/:id", pathRouteController.getAllPathRoutesByCreatedBy);
+router.route("/create").post(verifyToken, pathRouteController.createPathRoute);
+router
+  .route("/update/:id")
+  .patch(verifyToken, pathRouteController.updatePathRoute);
+router
+  .route("/delete/:id")
+  .delete(verifyToken, pathRouteController.deletePathRoute);
+router.route("/:id").get(verifyToken, pathRouteController.getPathRoute);
+router
+  .route("/filter/:category")
+  .get(verifyToken, pathRouteController.getPathRoutesByCategory);
 
 module.exports = router;
