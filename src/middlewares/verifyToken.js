@@ -1,18 +1,22 @@
+const httpStatus = require("http-status");
 const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
   const bearerHeader = req.header("Authorization");
   if (!bearerHeader) {
-    res.status(401).json({ message: "Access denied, No Token Provided" });
+    res
+      .status(httpStatus.UNAUTHORIZED)
+      .json({ message: "Access denied, No Token Provided" });
     return;
   }
   try {
-    jwt.verify(bearerHeader, process.env.JWT_SECRET, (err, decoded) => {
+    const token = bearerHeader.split(" ")[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, (err, user) => {
       if (err) {
-        res.status(401).json({ message: "Invalid Token" });
+        res.status(httpStatus.UNAUTHORIZED).json({ message: "Invalid Token" });
         return;
       }
-      req.uid = decoded._id;
+      req.user = user?._doc;
       next();
     });
   } catch (error) {
