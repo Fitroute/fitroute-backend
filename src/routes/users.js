@@ -5,7 +5,10 @@ const validate = require("../middlewares/validate");
 const verifyToken = require("../middlewares/verifyToken");
 const schemas = require("../validations/user");
 
-router.get("/", userController.getAllUsers);
+router.route("/").get(userController.getAllUsers);
+router
+  .route("/reset")
+  .post(validate(schemas.resetValidation), userController.resetUserPassword);
 router
   .route("/register")
   .post(validate(schemas.registerValidation), userController.register);
@@ -18,6 +21,12 @@ router
   .route("/pathRoutes")
   .get(verifyToken, userController.getAllPathRoutesByCreatedBy);
 router.route("/bmi").get(verifyToken, userController.getBMI);
-router.route("/update").patch(verifyToken, userController.updateUser);
+router
+  .route("/update")
+  .patch(
+    validate(schemas.updateValidation),
+    verifyToken,
+    userController.updateUser
+  );
 router.route("/delete").delete(verifyToken, userController.deleteUser);
 module.exports = router;

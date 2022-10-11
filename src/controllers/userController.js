@@ -1,9 +1,10 @@
-const bcrypt = require("bcrypt");
 const status = require("http-status");
+const uuid = require("uuid");
 const {
   insert,
-  loginUser,
+  checkUser,
   list,
+  resetPassword,
   update,
   removeUser,
 } = require("../services/userService");
@@ -14,6 +15,9 @@ const pathService = require("../services/pathRouteService");
 const {
   generateAccessToken,
   generateRefreshToken,
+  passwordHash,
+  passwordCompare,
+  sendMail,
 } = require("../utils/helper");
 
 // const uploadUserImage = async (req, res) => {
@@ -75,14 +79,55 @@ const getBMI = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  await update(req.user?._id, req.body)
+  await checkUser(req.body.email).then((user) => {
+    if (user) {
+      res.status(status.BAD_REQUEST).json({
+        message: "Update failed",
+        error: "Email already exists",
+      });
+      return;
+    }
+    update(req.user?._id, req.body)
+      .then((user) => {
+        res
+          .status(status.OK)
+          .json({ message: "User updated successfully", user });
+      })
+      .catch((e) => {
+        res.status(status.BAD_REQUEST).json("Error: " + e);
+      });
+  });
+};
+
+const resetUserPassword = async (req, res) => {
+  const newPassword = uuid.v4()?.split("-")[0] || `fit-${new Date().getTime()}`;
+  await resetPassword(
+    { email: req.body.email },
+    { password: passwordHash(newPassword) }
+  )
     .then((user) => {
-      res
-        .status(status.OK)
-        .json({ message: "User updated successfully", user });
+      if (!user) {
+        res.status(status.NOT_FOUND).json({
+          message: "Reset password failed",
+          error: "User not found",
+        });
+        return;
+      }
+      sendMail(
+        req.body.email,
+        "Reset password successfully",
+        `Your Password: ${newPassword}`
+      );
+      res.status(status.OK).json({
+        message: "Reset password successfully",
+        user,
+      });
     })
     .catch((e) => {
-      res.status(status.BAD_REQUEST).json("Error: " + e);
+      res.status(status.INTERNAL_SERVER_ERROR).json({
+        message: "When resetting password, an error occurred",
+        error: e.message,
+      });
     });
 };
 
@@ -99,7 +144,7 @@ const deleteUser = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  await User.findOne({ email: req.body.email }).then((user) => {
+  await checkUser(req.body.email).then((user) => {
     if (user) {
       res.status(status.BAD_REQUEST).json({
         message: "Registration failed",
@@ -108,9 +153,7 @@ const register = async (req, res) => {
       return;
     } else {
       //Password Hashing
-      const salt = bcrypt.genSaltSync(10);
-      const hash = bcrypt.hashSync(req.body.password, salt);
-      req.body.password = hash;
+      req.body.password = passwordHash(req.body.password);
       insert(req.body)
         .then((response) => {
           res.status(status.CREATED).json({
@@ -130,10 +173,10 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  await loginUser(email)
+  await checkUser(email)
     .then((user) => {
       // Checks users password
-      const isValid = bcrypt.compareSync(password, user.password);
+      const isValid = passwordCompare(password, user.password);
       if (!isValid) {
         res.status(status.BAD_REQUEST).json({
           message: "Login failed",
@@ -233,5 +276,6 @@ module.exports = {
   getAreaList,
   getAllPathRoutesByCreatedBy,
   updateUser,
+  resetUserPassword,
   deleteUser,
 };

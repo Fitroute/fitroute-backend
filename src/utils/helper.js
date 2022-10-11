@@ -1,4 +1,42 @@
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+
+const passwordHash = (password) => {
+  //Password Hashing
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(password, salt);
+  return hash;
+};
+
+const passwordCompare = (password, hash) => {
+  return bcrypt.compareSync(password, hash);
+};
+
+const sendMail = (email, subject, message) => {
+  var transporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  var mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: subject,
+    html: "<h1>" + message + "</h1>",
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
 
 const generateAccessToken = (user) => {
   return jwt.sign(
@@ -19,4 +57,7 @@ const generateRefreshToken = (user) => {
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
+  passwordHash,
+  passwordCompare,
+  sendMail,
 };

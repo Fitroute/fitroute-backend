@@ -6,7 +6,11 @@ const insert = (data) => {
 };
 
 const list = (where) => {
-  return FeedBack.find(where);
+  return FeedBack.find(where).populate({
+    //postModel de userı ref ettiğimiz için bu alanları getirebiliriz
+    path: "createdBy",
+    select: "name surname",
+  });
 };
 
 const update = (id, data) => {

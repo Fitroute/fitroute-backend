@@ -79,19 +79,20 @@ const getFeedback = async (req, res) => {
       });
     });
 };
-// ? IDK if this is needed
 // Get All Feedback by Route or Area ID
 const getAllFeedbacksByRouteOrAreaID = async (req, res) => {
-  try {
-    await FeedBack.find({ routeId: req.params.id }).then((feedback) => {
-      res.status(200).json(feedback);
+  await list({ routeId: req.params.id })
+    .then((feedbacks) => {
+      res
+        .status(httpStatus.OK)
+        .json({ message: "Feedbacks fetched successfully", feedbacks });
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Error while fetching feedbacks",
+        error: err,
+      });
     });
-  } catch (error) {
-    res.status(400).json({
-      message: "An error occurred",
-      error: error.message,
-    });
-  }
 };
 
 module.exports = {
