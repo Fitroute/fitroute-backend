@@ -5,12 +5,16 @@ const insert = (data) => {
   return user.save();
 };
 
-const loginUser = (email) => {
+const checkUser = (email) => {
   return User.findOne({ email });
 };
 
 const list = (where) => {
   return User.find(where);
+};
+
+const resetPassword = (where, data) => {
+  return User.findOneAndUpdate(where, data, { new: true });
 };
 
 const update = (id, data) => {
@@ -21,4 +25,4 @@ const removeUser = (id) => {
   return User.findByIdAndDelete(id);
 };
 
-module.exports = { insert, loginUser, list, update, removeUser };
+module.exports = { insert, checkUser, list, resetPassword, update, removeUser };

@@ -5,7 +5,12 @@ const insert = (data) => {
 };
 
 const list = (where) => {
-  return Post.find(where);
+  // populate ile createdBy altında bize dönmesini istediğimiz alanları belirtiyoruz
+  return Post.find(where).populate({
+    //postModel de userı ref ettiğimiz için bu alanları getirebiliriz
+    path: "createdBy",
+    select: "name surname",
+  });
 };
 
 const update = (id, data) => {

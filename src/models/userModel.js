@@ -27,10 +27,6 @@ const Schema = mongoose.Schema(
       type: String,
       required: true,
     },
-    age: {
-      type: Number,
-      required: false,
-    },
     height: {
       type: Number,
       required: false,

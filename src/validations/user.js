@@ -18,4 +18,22 @@ const registerValidation = Joi.object({
   city: Joi.string().required(),
 });
 
-module.exports = { loginValidation, registerValidation };
+const updateValidation = Joi.object({
+  name: Joi.string().min(3),
+  surname: Joi.string().min(3),
+  email: Joi.string().email(),
+  country: Joi.string(),
+  city: Joi.string(),
+  height: Joi.number(),
+  weight: Joi.number(),
+});
+const resetValidation = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+module.exports = {
+  loginValidation,
+  registerValidation,
+  updateValidation,
+  resetValidation,
+};
