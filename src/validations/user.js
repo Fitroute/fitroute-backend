@@ -27,13 +27,20 @@ const updateValidation = Joi.object({
   height: Joi.number(),
   weight: Joi.number(),
 });
+
+const sendCodeValidation = Joi.object({
+  email: Joi.string().email().required(),
+});
 const resetValidation = Joi.object({
   email: Joi.string().email().required(),
+  code: Joi.string().required(),
+  password: Joi.string().required(),
 });
 
 module.exports = {
   loginValidation,
   registerValidation,
   updateValidation,
+  sendCodeValidation,
   resetValidation,
 };

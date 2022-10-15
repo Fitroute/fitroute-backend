@@ -4,9 +4,10 @@ const {
   insert,
   checkUser,
   list,
-  resetPassword,
+  updateWithEmail,
   update,
   removeUser,
+  removeResetCode,
 } = require("../services/userService");
 
 const postService = require("../services/postService");
@@ -99,36 +100,56 @@ const updateUser = async (req, res) => {
   });
 };
 
-const resetUserPassword = async (req, res) => {
-  const newPassword = uuid.v4()?.split("-")[0] || `fit-${new Date().getTime()}`;
-  await resetPassword(
-    { email: req.body.email },
-    { password: passwordHash(newPassword) }
-  )
-    .then((user) => {
-      if (!user) {
-        res.status(status.NOT_FOUND).json({
-          message: "Reset password failed",
-          error: "User not found",
-        });
-        return;
-      }
-      sendMail(
-        req.body.email,
-        "Reset password successfully",
-        `Your Password: ${newPassword}`
-      );
-      res.status(status.OK).json({
-        message: "Reset password successfully",
-        user,
+const sendCode = async (req, res) => {
+  checkUser(req.body.email).then((user) => {
+    if (!user) {
+      res.status(status.BAD_REQUEST).json({
+        message: "Send code failed",
+        error: "Email does not exist",
       });
-    })
-    .catch((e) => {
-      res.status(status.INTERNAL_SERVER_ERROR).json({
-        message: "When resetting password, an error occurred",
-        error: e.message,
+      return;
+    }
+    const code = uuid.v4()?.split("-")[0] || `fit-${new Date().getTime()}`;
+    updateWithEmail({ email: req.body.email }, { resetCode: code }).then(
+      (response) => {
+        sendMail(req.body.email, "Verify code", `Your code: ${code}`);
+        res.status(status.OK).json({
+          message: "Send code successfully",
+          code,
+        });
+      }
+    );
+  });
+};
+
+const resetPassword = async (req, res) => {
+  checkUser(req.body.email).then((user) => {
+    if (!user) {
+      res.status(status.BAD_REQUEST).json({
+        message: "Reset password failed",
+        error: "Email does not exist",
+      });
+      return;
+    }
+    if (user.resetCode !== req.body.code) {
+      res.status(status.BAD_REQUEST).json({
+        message: "Reset password failed",
+        error: "Code is incorrect",
+      });
+      return;
+    }
+    updateWithEmail(
+      { email: req.body.email },
+      { password: passwordHash(req.body.password) }
+    ).then((response) => {
+      removeResetCode(req.body.email).then((response) => {
+        res.status(status.OK).json({
+          message: "Reset password successfully",
+          response,
+        });
       });
     });
+  });
 };
 
 const deleteUser = async (req, res) => {
@@ -275,7 +296,8 @@ module.exports = {
   getPostList,
   getAreaList,
   getAllPathRoutesByCreatedBy,
+  sendCode,
+  resetPassword,
   updateUser,
-  resetUserPassword,
   deleteUser,
 };

@@ -39,6 +39,10 @@ const Schema = mongoose.Schema(
       type: Buffer,
       required: false,
     },
+    resetCode: {
+      type: String,
+      required: false,
+    },
   },
   { timestamps: true, versionKey: false }
 );
