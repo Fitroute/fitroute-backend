@@ -36,40 +36,48 @@ const createPost = async (req, res) => {
 
 const updatePost = async (req, res) => {
   if (!req.params.id) {
-    res.status(400).json({
+    res.status(httpStatus.BAD_REQUEST).json({
       message: "Post id is required",
     });
-  } else {
-    await update(req.params.id, req.body)
-      .then((post) => {
-        res.status(httpStatus.OK).json({
-          message: "Post updated successfully",
-          post,
-        });
-      })
-      .catch((err) => {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
-      });
+    return;
   }
+  await update(req.params.id, req.body)
+    .then((post) => {
+      if (!post) {
+        res.status(httpStatus.NOT_FOUND).json({
+          message: "Post not found",
+        });
+        return;
+      }
+      res.status(httpStatus.OK).json({
+        message: "Post updated successfully",
+        post,
+      });
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+    });
 };
 
 const deletePost = async (req, res) => {
   if (!req.params.id) {
-    res.status(400).json({
+    res.status(httpStatus.BAD_REQUEST).json({
       message: "Post id is required",
     });
-  } else {
-    await removePost
-      .then((post) => {
-        res.status(httpStatus.OK).json({
-          message: "Post deleted successfully",
-          post,
-        });
-      })
-      .catch((err) => {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
-      });
+    return;
   }
+  await removePost(req.params.id).then((post) => {
+    if (!post) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Post not found",
+      });
+      return;
+    }
+    res.status(httpStatus.OK).json({
+      message: "Post deleted successfully",
+      post,
+    });
+  });
 };
 
 module.exports = { createPost, getAllPosts, updatePost, deletePost };

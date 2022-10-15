@@ -6,10 +6,21 @@ const verifyToken = require("../middlewares/verifyToken");
 const schemas = require("../validations/user");
 
 router.route("/").get(userController.getAllUsers);
-router.route("/send").post(schemas.sendCodeValidation, userController.sendCode);
+router.route("/profile-image").post(verifyToken, userController.uploadImage);
+router
+  .route("/send")
+  .post(validate(schemas.sendCodeValidation), userController.sendCode);
 router
   .route("/reset")
-  .post(schemas.resetValidation, userController.resetPassword);
+  .post(validate(schemas.resetValidation), userController.resetPassword);
+router
+  .route("/change")
+  .post(
+    verifyToken,
+    validate(schemas.changePasswordValidation),
+    userController.changePassword
+  );
+
 router
   .route("/register")
   .post(validate(schemas.registerValidation), userController.register);

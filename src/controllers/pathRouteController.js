@@ -37,36 +37,46 @@ const createPathRoute = async (req, res) => {
 
 // Update PathRoute
 const updatePathRoute = async (req, res) => {
-  await update(req.params.id, req.body)
-    .then((pathRoute) => {
-      res.status(httpStatus.OK).json({
-        message: "PathRoute updated successfully",
-        pathRoute,
-      });
-    })
-    .catch((err) => {
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-        message: "An error occurred",
-        error: err.message,
-      });
+  if (!req.params.id) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      message: "PathRoute ID is required",
     });
+    return;
+  }
+  await update(req.params.id, req.body).then((pathRoute) => {
+    if (!pathRoute) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "PathRoute not found",
+      });
+      return;
+    }
+    res.status(httpStatus.OK).json({
+      message: "PathRoute updated successfully",
+      pathRoute,
+    });
+  });
 };
 
 // Delete PathRoute
 const deletePathRoute = async (req, res) => {
-  await deleteRoute(req.params.id)
-    .then((pathRoute) => {
-      res.status(httpStatus.OK).json({
-        message: "PathRoute deleted successfully",
-        pathRoute,
-      });
-    })
-    .catch((err) => {
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-        message: "An error occurred",
-        error: err.message,
-      });
+  if (!req.params.id) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      message: "PathRoute ID is required",
     });
+    return;
+  }
+  await deleteRoute(req.params.id).then((pathRoute) => {
+    if (!pathRoute) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "PathRoute not found",
+      });
+      return;
+    }
+    res.status(httpStatus.OK).json({
+      message: "PathRoute deleted successfully",
+      pathRoute,
+    });
+  });
 };
 
 // Get PathRoutes by Category

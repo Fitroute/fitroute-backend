@@ -1,5 +1,6 @@
 const status = require("http-status");
 const uuid = require("uuid");
+const path = require("path");
 const {
   insert,
   checkUser,
@@ -21,22 +22,38 @@ const {
   sendMail,
 } = require("../utils/helper");
 
-// const uploadUserImage = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id);
-//     user.image = req.file.buffer;
-//     await user.save();
-//     res.status(200).json({
-//       message: "Image uploaded successfully",
-//       user,
-//     });
-//   } catch (error) {
-//     res.status(400).json({
-//       message: "An error occurred",
-//       error: error.message,
-//     });
-//   }
-// };
+const uploadImage = async (req, res) => {
+  if (!req.files.image) {
+    res.status(status.BAD_REQUEST).json({
+      message: "Upload failed",
+      error: "Image is required",
+    });
+    return;
+  }
+  const fileExtension = path.extname(req.files.image.name);
+  const fileName = `${req.user._id}${fileExtension}`;
+  console.log(fileName);
+  const folderPath = path.join(__dirname, "../", "uploads/users", fileName);
+
+  req.files.image.mv(folderPath, (err) => {
+    if (err) {
+      return res.status(status.INTERNAL_SERVER_ERROR).json({ error: err });
+    }
+    update(req.user._id, { image: fileName })
+      .then((user) => {
+        res.status(status.OK).json({
+          message: "Upload successfully",
+          user,
+        });
+      })
+      .catch((e) => {
+        res.status(status.INTERNAL_SERVER_ERROR).json({
+          message: "Upload success but update failed",
+          error: e.message,
+        });
+      });
+  });
+};
 
 const getBMI = async (req, res) => {
   list({ _id: req.user?._id })
@@ -149,6 +166,30 @@ const resetPassword = async (req, res) => {
         });
       });
     });
+  });
+};
+
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  await checkUser(req.user?.email).then((user) => {
+    const isValid = passwordCompare(oldPassword, user.password);
+    if (!isValid) {
+      res.status(status.BAD_REQUEST).json({
+        message: "Change password failed",
+        error: "Old password is incorrect",
+      });
+      return;
+    }
+    update(req.user?._id, { password: passwordHash(newPassword) })
+      .then((user) => {
+        res.status(status.OK).json({
+          message: "Change password successfully",
+          user,
+        });
+      })
+      .catch((e) => {
+        res.status(status.INTERNAL_SERVER_ERROR).json("Error: " + e);
+      });
   });
 };
 
@@ -298,6 +339,8 @@ module.exports = {
   getAllPathRoutesByCreatedBy,
   sendCode,
   resetPassword,
+  changePassword,
   updateUser,
   deleteUser,
+  uploadImage,
 };

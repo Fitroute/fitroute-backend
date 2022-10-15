@@ -3,6 +3,8 @@ const app = express();
 require("dotenv").config();
 const cors = require("cors");
 const helmet = require("helmet");
+const fileUpload = require("express-fileupload");
+const path = require("path");
 
 //Import Routes
 require("./src/config/db");
@@ -17,11 +19,16 @@ app.use(express.json());
 app.use(cors());
 // Helmet paketi ile güvenlik önlemleri alınır
 app.use(helmet());
+// File upload için middleware
+app.use(fileUpload());
 
 //Main Route
 app.get("/", (req, res) => {
   res.send("Welcome to fitroute-backend 👋!");
 });
+
+//Static Files
+app.use("/uploads", express.static(path.join(__dirname, "src/uploads")));
 
 //Users Route
 app.use("/users", usersRouter);
