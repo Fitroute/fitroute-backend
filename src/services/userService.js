@@ -13,8 +13,16 @@ const list = (where) => {
   return User.find(where);
 };
 
-const resetPassword = (where, data) => {
+const updateWithEmail = (where, data) => {
   return User.findOneAndUpdate(where, data, { new: true });
+};
+
+const removeResetCode = (email) => {
+  return User.findOneAndUpdate(
+    { email },
+    { $unset: { resetCode: "" } },
+    { new: true }
+  );
 };
 
 const update = (id, data) => {
@@ -25,4 +33,12 @@ const removeUser = (id) => {
   return User.findByIdAndDelete(id);
 };
 
-module.exports = { insert, checkUser, list, resetPassword, update, removeUser };
+module.exports = {
+  insert,
+  checkUser,
+  list,
+  updateWithEmail,
+  update,
+  removeUser,
+  removeResetCode,
+};
