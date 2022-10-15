@@ -63,35 +63,45 @@ const createArea = async (req, res) => {
 };
 
 const updateArea = async (req, res) => {
-  await update(req.params.id, req.body)
-    .then((area) => {
-      res.status(httpStatus.OK).json({
-        message: "Area updated successfully",
-        area,
-      });
-    })
-    .catch((err) => {
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-        message: "Error while updating area",
-        error: err,
-      });
+  if (!req.params.id) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      message: "Area id is required",
     });
+    return;
+  }
+  await update(req.params.id, req.body).then((area) => {
+    if (!area) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Area not found",
+      });
+      return;
+    }
+    res.status(httpStatus.OK).json({
+      message: "Area updated successfully",
+      area,
+    });
+  });
 };
 
 const deleteArea = async (req, res) => {
-  await removeArea(req.params.id)
-    .then((area) => {
-      res.status(httpStatus.OK).json({
-        message: "Area deleted successfully",
-        area,
-      });
-    })
-    .catch((err) => {
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-        message: "Error while deleting area",
-        error: err,
-      });
+  if (!req.params.id) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      message: "Area id is required",
     });
+    return;
+  }
+  await removeArea(req.params.id).then((area) => {
+    if (!area) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Area not found",
+      });
+      return;
+    }
+    res.status(httpStatus.OK).json({
+      message: "Area deleted successfully",
+      area,
+    });
+  });
 };
 
 module.exports = {

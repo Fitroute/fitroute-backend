@@ -31,36 +31,46 @@ const createFeedback = async (req, res) => {
 
 // Update Feedback
 const updateFeedback = async (req, res) => {
-  await update(req.params.id, req.body)
-    .then((feedback) => {
-      res.status(httpStatus.OK).json({
-        message: "Feedback updated successfully",
-        feedback,
-      });
-    })
-    .catch((err) => {
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-        message: "Error while updating feedback",
-        error: err,
-      });
+  if (!req.params.id) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      message: "Feedback ID is required",
     });
+    return;
+  }
+  await update(req.params.id, req.body).then((feedback) => {
+    if (!feedback) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Feedback not found",
+      });
+      return;
+    }
+    res.status(httpStatus.OK).json({
+      message: "Feedback updated successfully",
+      feedback,
+    });
+  });
 };
 
 // Delete Feedback
 const deleteFeedback = async (req, res) => {
-  await removeFeedback(req.params.id)
-    .then((feedback) => {
-      res.status(httpStatus.OK).json({
-        message: "Feedback deleted successfully",
-        feedback,
-      });
-    })
-    .catch((err) => {
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-        message: "Error while deleting feedback",
-        error: err,
-      });
+  if (!req.params.id) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      message: "Feedback ID is required",
     });
+    return;
+  }
+  await removeFeedback(req.params.id).then((feedback) => {
+    if (!feedback) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Feedback not found",
+      });
+      return;
+    }
+    res.status(httpStatus.OK).json({
+      message: "Feedback deleted successfully",
+      feedback,
+    });
+  });
 };
 
 // Get Feedback by ID

@@ -4,7 +4,7 @@ const loginValidation = Joi.object({
   email: Joi.string()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
     .required(),
-  password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
+  password: Joi.string().min(6).required(),
 });
 
 const registerValidation = Joi.object({
@@ -13,7 +13,7 @@ const registerValidation = Joi.object({
   email: Joi.string()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
     .required(),
-  password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")).required(),
+  password: Joi.string().min(6).required(),
   country: Joi.string().required(),
   city: Joi.string().required(),
 });
@@ -27,7 +27,10 @@ const updateValidation = Joi.object({
   height: Joi.number(),
   weight: Joi.number(),
 });
-
+const changePasswordValidation = Joi.object({
+  oldPassword: Joi.string().min(6).required(),
+  newPassword: Joi.string().min(6).required(),
+});
 const sendCodeValidation = Joi.object({
   email: Joi.string().email().required(),
 });
@@ -43,4 +46,5 @@ module.exports = {
   updateValidation,
   sendCodeValidation,
   resetValidation,
+  changePasswordValidation,
 };
