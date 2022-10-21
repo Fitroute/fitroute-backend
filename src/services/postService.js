@@ -1,4 +1,5 @@
 const Post = require("../models/postModel");
+
 const insert = (data) => {
   const post = new Post(data);
   return post.save();
@@ -13,6 +14,10 @@ const list = (where) => {
   });
 };
 
+const findOne = (where) => {
+  return Post.findOne(where);
+};
+
 const update = (id, data) => {
   return Post.findByIdAndUpdate(id, data, { new: true });
 };
@@ -21,4 +26,4 @@ const removePost = (id) => {
   return Post.findByIdAndDelete(id);
 };
 
-module.exports = { insert, list, update, removePost };
+module.exports = { insert, list, update, removePost, findOne };

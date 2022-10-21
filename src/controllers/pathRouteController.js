@@ -4,6 +4,7 @@ const {
   list,
   update,
   deleteRoute,
+  findOne,
 } = require("../services/pathRouteService");
 
 //name
@@ -113,10 +114,59 @@ const getPathRoute = async (req, res) => {
     });
 };
 
+const createComment = async (req, res) => {
+  findOne({ _id: req.params.id }).then((pathRoute) => {
+    if (!pathRoute) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Path Route not found",
+      });
+      return;
+    }
+    const comment = {
+      ...req.body,
+      commented_at: new Date(),
+      createdBy: req.user,
+    };
+    pathRoute.comments.push(comment);
+    pathRoute
+      .save()
+      .then((commentedRoute) => {
+        res.status(httpStatus.OK).json({
+          message: "Comment created successfully",
+          commentedRoute,
+        });
+      })
+      .catch((err) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      });
+  });
+};
+const deleteComment = async (req, res) => {
+  findOne({ _id: req.params.id }).then((pathRoute) => {
+    if (!pathRoute) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Path Route not found",
+      });
+      return;
+    }
+    pathRoute.comments = pathRoute.comments.filter(
+      (comment) => comment._id != req.params.commentId
+    );
+    pathRoute.save().then((commentedRoute) => {
+      res.status(httpStatus.OK).json({
+        message: "Comment deleted successfully",
+        commentedRoute,
+      });
+    });
+  });
+};
+
 module.exports = {
   createPathRoute,
   updatePathRoute,
   deletePathRoute,
   getPathRoute,
   getPathRoutesByCategory,
+  createComment,
+  deleteComment,
 };

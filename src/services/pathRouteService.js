@@ -13,6 +13,10 @@ const list = (where) => {
   });
 };
 
+const findOne = (where) => {
+  return PathRoute.findOne(where);
+};
+
 const update = (id, data) => {
   return PathRoute.findByIdAndUpdate(id, data, { new: true });
 };
@@ -21,4 +25,4 @@ const deleteRoute = (id) => {
   return PathRoute.findByIdAndDelete(id);
 };
 
-module.exports = { insert, list, update, deleteRoute };
+module.exports = { insert, list, update, deleteRoute, findOne };

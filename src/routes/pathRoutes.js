@@ -14,5 +14,10 @@ router.route("/:id").get(verifyToken, pathRouteController.getPathRoute);
 router
   .route("/filter/:category")
   .get(verifyToken, pathRouteController.getPathRoutesByCategory);
-
+router
+  .route("/comment/:id")
+  .post(verifyToken, pathRouteController.createComment);
+router
+  .route("/comment/:id/:commentId")
+  .delete(verifyToken, pathRouteController.deleteComment);
 module.exports = router;

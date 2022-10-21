@@ -1,5 +1,11 @@
 const httpStatus = require("http-status");
-const { insert, list, update, removePost } = require("../services/postService");
+const {
+  insert,
+  list,
+  update,
+  removePost,
+  findOne,
+} = require("../services/postService");
 
 //createdBy - user id
 //title
@@ -80,4 +86,59 @@ const deletePost = async (req, res) => {
   });
 };
 
-module.exports = { createPost, getAllPosts, updatePost, deletePost };
+const createComment = async (req, res) => {
+  findOne({ _id: req.params.id }).then((post) => {
+    if (!post) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Post not found",
+      });
+      return;
+    }
+    const comment = {
+      ...req.body,
+      commented_at: new Date(),
+      createdBy: req.user,
+    };
+    post.comments.push(comment);
+    post
+      .save()
+      .then((commentedPost) => {
+        res.status(httpStatus.OK).json({
+          message: "Comment created successfully",
+          commentedPost,
+        });
+      })
+      .catch((err) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      });
+  });
+};
+
+const deleteComment = async (req, res) => {
+  findOne({ _id: req.params.id }).then((post) => {
+    if (!post) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Post not found",
+      });
+      return;
+    }
+    post.comments = post.comments.filter(
+      (comment) => comment._id != req.params.commentId
+    );
+    post.save().then((commentedPost) => {
+      res.status(httpStatus.OK).json({
+        message: "Comment deleted successfully",
+        commentedPost,
+      });
+    });
+  });
+};
+
+module.exports = {
+  createPost,
+  getAllPosts,
+  updatePost,
+  deletePost,
+  createComment,
+  deleteComment,
+};
