@@ -10,5 +10,11 @@ router
 router.route("/create").post(verifyToken, sportAreaController.createArea);
 router.route("/update/:id").patch(verifyToken, sportAreaController.updateArea);
 router.route("/delete/:id").delete(verifyToken, sportAreaController.deleteArea);
+router
+  .route("/comment/:id")
+  .post(verifyToken, sportAreaController.createComment);
+router
+  .route("/comment/:id/:commentId")
+  .delete(verifyToken, sportAreaController.deleteComment);
 
 module.exports = router;

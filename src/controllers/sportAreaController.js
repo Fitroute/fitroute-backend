@@ -4,6 +4,7 @@ const {
   list,
   update,
   removeArea,
+  findOne,
 } = require("../services/sportAreaService");
 
 //createdBy - user id
@@ -104,10 +105,60 @@ const deleteArea = async (req, res) => {
   });
 };
 
+const createComment = async (req, res) => {
+  findOne({ _id: req.params.id }).then((area) => {
+    if (!area) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Area not found",
+      });
+      return;
+    }
+    const comment = {
+      ...req.body,
+      commented_at: new Date(),
+      createdBy: req.user,
+    };
+    area.comments.push(comment);
+    area
+      .save()
+      .then((commentedArea) => {
+        res.status(httpStatus.OK).json({
+          message: "Comment created successfully",
+          commentedArea,
+        });
+      })
+      .catch((err) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      });
+  });
+};
+
+const deleteComment = async (req, res) => {
+  findOne({ _id: req.params.id }).then((area) => {
+    if (!area) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Area not found",
+      });
+      return;
+    }
+    area.comments = area.comments.filter(
+      (comment) => comment._id != req.params.commentId
+    );
+    area.save().then((commentedArea) => {
+      res.status(httpStatus.OK).json({
+        message: "Comment deleted successfully",
+        commentedArea,
+      });
+    });
+  });
+};
+
 module.exports = {
   createArea,
   getAllAreas,
   getAreasByCategory,
   updateArea,
   deleteArea,
+  createComment,
+  deleteComment,
 };

@@ -13,10 +13,16 @@ const Schema = mongoose.Schema(
       type: String,
       required: true,
     },
-    image: {
-      type: Buffer,
-      required: false,
-    },
+    images: [{ type: String }],
+    comments: [
+      {
+        comment: String,
+        commented_at: Date,
+        displayName: Boolean,
+        score: Number,
+        createdBy: { type: mongoose.Types.ObjectId, ref: "users" },
+      },
+    ],
   },
   { timestamps: true, versionKey: false }
 );
