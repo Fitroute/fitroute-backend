@@ -1,7 +1,9 @@
 //CRUD Operations
 const router = require("express").Router();
 const pathRouteController = require("../controllers/pathRouteController");
+const validate = require("../middlewares/validate");
 const verifyToken = require("../middlewares/verifyToken");
+const schemas = require("../validations/route");
 
 router.route("/create").post(verifyToken, pathRouteController.createPathRoute);
 router
@@ -16,7 +18,11 @@ router
   .get(verifyToken, pathRouteController.getPathRoutesByCategory);
 router
   .route("/comment/:id")
-  .post(verifyToken, pathRouteController.createComment);
+  .post(
+    verifyToken,
+    validate(schemas.commentValidation),
+    pathRouteController.createComment
+  );
 router
   .route("/comment/:id/:commentId")
   .delete(verifyToken, pathRouteController.deleteComment);
