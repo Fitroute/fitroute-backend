@@ -129,7 +129,12 @@ const sendCode = async (req, res) => {
     const code = uuid.v4()?.split("-")[0] || `fit-${new Date().getTime()}`;
     updateWithEmail({ email: req.body.email }, { resetCode: code }).then(
       (response) => {
-        sendMail(req.body.email, "Verify code", `Your code: ${code}`);
+        sendMail({
+          email: req.body.email,
+          subject: "Verify code",
+          username: user.name,
+          message: code,
+        });
         res.status(status.OK).json({
           message: "Send code successfully",
           code,

@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const hbs = require("nodemailer-express-handlebars");
 const nodemailer = require("nodemailer");
+const path = require("path");
 
 const passwordHash = (password) => {
   //Password Hashing
@@ -13,7 +15,7 @@ const passwordCompare = (password, hash) => {
   return bcrypt.compareSync(password, hash);
 };
 
-const sendMail = (email, subject, message) => {
+const sendMail = ({ email, subject, username, message }) => {
   var transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE,
     auth: {
@@ -22,16 +24,32 @@ const sendMail = (email, subject, message) => {
     },
   });
 
+  const handlebarOptions = {
+    viewEngine: {
+      extName: ".handlebars",
+      partialsDir: path.resolve(__dirname, "../utils/views"),
+      defaultLayout: false,
+    },
+    viewPath: path.resolve(__dirname, "../utils/views"),
+    extName: ".handlebars",
+  };
+
+  transporter.use("compile", hbs(handlebarOptions));
+
   var mailOptions = {
     from: process.env.EMAIL_FROM,
     to: email,
     subject: subject,
-    html: "<h1>" + message + "</h1>",
+    template: "email",
+    context: {
+      name: username,
+      code: message,
+    },
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      console.log(error);
+      console.log("Email sent: " + error);
     } else {
       console.log("Email sent: " + info.response);
     }
