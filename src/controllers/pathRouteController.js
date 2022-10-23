@@ -80,6 +80,23 @@ const deletePathRoute = async (req, res) => {
   });
 };
 
+// Get All PathRoutes
+const getAllPathRoutes = async (req, res) => {
+  await list()
+    .then((pathRoutes) => {
+      res.status(httpStatus.OK).json({
+        message: "PathRoutes fetched successfully",
+        pathRoutes,
+      });
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Error while fetching pathroutes",
+        error: err,
+      });
+    });
+};
+
 // Get PathRoutes by Category
 const getPathRoutesByCategory = async (req, res) => {
   await list({ category: req.params.category })
@@ -166,6 +183,7 @@ module.exports = {
   updatePathRoute,
   deletePathRoute,
   getPathRoute,
+  getAllPathRoutes,
   getPathRoutesByCategory,
   createComment,
   deleteComment,

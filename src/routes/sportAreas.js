@@ -7,8 +7,10 @@ const schemas = require("../validations/area");
 
 router.route("/").get(sportAreaController.getAllAreas);
 router
-  .route("/:category")
+  .route("/filter/:category")
   .get(verifyToken, sportAreaController.getAreasByCategory);
+
+router.route("/:id").get(verifyToken, sportAreaController.getArea);
 router
   .route("/create")
   .post(

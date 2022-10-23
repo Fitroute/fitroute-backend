@@ -30,6 +30,23 @@ const getAllAreas = async (req, res) => {
     });
 };
 
+// Get area by ID
+const getArea = async (req, res) => {
+  await list({ _id: req.params.id })
+    .then((area) => {
+      res.status(httpStatus.OK).json({
+        message: "Area fetched successfully",
+        area,
+      });
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "An error occurred",
+        error: err.message,
+      });
+    });
+};
+
 const getAreasByCategory = async (req, res) => {
   await list({ category: req.params.category })
     .then((areas) => {
@@ -157,6 +174,7 @@ module.exports = {
   createArea,
   getAllAreas,
   getAreasByCategory,
+  getArea,
   updateArea,
   deleteArea,
   createComment,
