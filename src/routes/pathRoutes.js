@@ -5,6 +5,7 @@ const validate = require("../middlewares/validate");
 const verifyToken = require("../middlewares/verifyToken");
 const schemas = require("../validations/route");
 
+router.route("/").get(pathRouteController.getAllPathRoutes);
 router
   .route("/create")
   .post(
