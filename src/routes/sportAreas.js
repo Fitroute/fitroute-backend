@@ -9,8 +9,20 @@ router.route("/").get(sportAreaController.getAllAreas);
 router
   .route("/:category")
   .get(verifyToken, sportAreaController.getAreasByCategory);
-router.route("/create").post(verifyToken, sportAreaController.createArea);
-router.route("/update/:id").patch(verifyToken, sportAreaController.updateArea);
+router
+  .route("/create")
+  .post(
+    verifyToken,
+    validate(schemas.createValidation),
+    sportAreaController.createArea
+  );
+router
+  .route("/update/:id")
+  .patch(
+    verifyToken,
+    validate(schemas.updateValidation),
+    sportAreaController.updateArea
+  );
 router.route("/delete/:id").delete(verifyToken, sportAreaController.deleteArea);
 router
   .route("/comment/:id")
