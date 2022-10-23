@@ -99,7 +99,7 @@ const getAllPathRoutes = async (req, res) => {
 
 // Get PathRoutes by Category
 const getPathRoutesByCategory = async (req, res) => {
-  await list({ category: req.params.category })
+  await list({ category: { $regex: req.params.category, $options: "i" } })
     .then((pathRoutes) => {
       res.status(httpStatus.OK).json({
         message: "Routes fetched successfully",

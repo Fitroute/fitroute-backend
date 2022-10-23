@@ -47,8 +47,11 @@ const getArea = async (req, res) => {
     });
 };
 
+// Get Areas by Category
 const getAreasByCategory = async (req, res) => {
-  await list({ category: req.params.category })
+  await list({
+    category: { $regex: req.params.category, $options: "i" },
+  })
     .then((areas) => {
       res.status(httpStatus.OK).json({
         message: "Areas fetched successfully",
