@@ -73,6 +73,25 @@ const getAllPosts = async (req, res) => {
     });
 };
 
+// Get Posts by Title
+const getPostByTitle = async (req, res) => {
+  await list({
+    title: { $regex: req.params.title, $options: "i" },
+  })
+    .then((post) => {
+      res.status(httpStatus.OK).json({
+        message: "Posts fetched successfully",
+        post,
+      });
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "Error while fetching posts",
+        error: err,
+      });
+    });
+};
+
 const createPost = async (req, res) => {
   req.body.createdBy = req.user;
   await insert(req.body)
@@ -185,6 +204,7 @@ module.exports = {
   uploadImages,
   createPost,
   getPost,
+  getPostByTitle,
   getAllPosts,
   updatePost,
   deletePost,
