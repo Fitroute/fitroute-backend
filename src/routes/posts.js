@@ -7,6 +7,9 @@ const schemas = require("../validations/post");
 
 router.route("/").get(postController.getAllPosts);
 router.route("/create").post(verifyToken, postController.createPost);
+router
+  .route("/upload-images/:id")
+  .post(verifyToken, postController.uploadImages);
 router.route("/update/:id").patch(verifyToken, postController.updatePost);
 router.route("/delete/:id").delete(verifyToken, postController.deletePost);
 router
