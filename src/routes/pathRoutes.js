@@ -5,10 +5,20 @@ const validate = require("../middlewares/validate");
 const verifyToken = require("../middlewares/verifyToken");
 const schemas = require("../validations/route");
 
-router.route("/create").post(verifyToken, pathRouteController.createPathRoute);
+router
+  .route("/create")
+  .post(
+    verifyToken,
+    validate(schemas.createValidation),
+    pathRouteController.createPathRoute
+  );
 router
   .route("/update/:id")
-  .patch(verifyToken, pathRouteController.updatePathRoute);
+  .patch(
+    verifyToken,
+    validate(schemas.updateValidation),
+    pathRouteController.updatePathRoute
+  );
 router
   .route("/delete/:id")
   .delete(verifyToken, pathRouteController.deletePathRoute);
