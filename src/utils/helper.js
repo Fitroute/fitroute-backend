@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const hbs = require("nodemailer-express-handlebars");
 const nodemailer = require("nodemailer");
 const path = require("path");
+const fs = require("fs");
+
 
 const passwordHash = (password) => {
   //Password Hashing
@@ -72,10 +74,20 @@ const generateRefreshToken = (user) => {
   );
 };
 
+const createFolder = (dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    return console.log("Directory is created.");
+  } else {
+    return console.log("Directory already exists");
+  }
+};
+
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
   passwordHash,
   passwordCompare,
   sendMail,
+  createFolder,
 };
