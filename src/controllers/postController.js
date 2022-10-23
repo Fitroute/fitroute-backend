@@ -42,6 +42,23 @@ const uploadImages = async (req, res) => {
   });
 };
 
+// Get Post by ID
+const getPost = async (req, res) => {
+  await list({ _id: req.params.id })
+    .then((post) => {
+      res.status(httpStatus.OK).json({
+        message: "Post fetched successfully",
+        post,
+      });
+    })
+    .catch((err) => {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        message: "An error occurred",
+        error: err.message,
+      });
+    });
+};
+
 const getAllPosts = async (req, res) => {
   await list()
     .then((posts) => {
@@ -167,6 +184,7 @@ const deleteComment = async (req, res) => {
 module.exports = {
   uploadImages,
   createPost,
+  getPost,
   getAllPosts,
   updatePost,
   deletePost,

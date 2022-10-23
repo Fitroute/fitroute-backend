@@ -14,6 +14,7 @@ router
     validate(schemas.createValidation),
     postController.createPost
   );
+router.route("/:id").get(verifyToken, postController.getPost);
 router
   .route("/upload-images/:id")
   .post(verifyToken, postController.uploadImages);
