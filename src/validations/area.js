@@ -6,4 +6,20 @@ const commentValidation = Joi.object({
   score: Joi.number().required(),
 });
 
-module.exports = { commentValidation };
+const createValidation = Joi.object({
+  name: Joi.string().min(3).required(),
+  category: Joi.string().min(3).required(),
+  location: Joi.string().required(),
+  images: Joi.array(),
+  description: Joi.string(),
+});
+
+const updateValidation = Joi.object({
+  name: Joi.string().min(3).required(),
+  category: Joi.string().min(3).required(),
+  location: Joi.string().required(),
+  images: Joi.array(),
+  description: Joi.string(),
+});
+
+module.exports = { commentValidation, createValidation, updateValidation };
