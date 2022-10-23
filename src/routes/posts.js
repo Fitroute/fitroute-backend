@@ -6,6 +6,7 @@ const verifyToken = require("../middlewares/verifyToken");
 const schemas = require("../validations/post");
 
 router.route("/").get(postController.getAllPosts);
+
 router
   .route("/create")
   .post(
@@ -14,12 +15,16 @@ router
     postController.createPost
   );
 router
+  .route("/upload-images/:id")
+  .post(verifyToken, postController.uploadImages);
+router
   .route("/update/:id")
   .patch(
     verifyToken,
     validate(schemas.updateValidation),
     postController.updatePost
   );
+
 router.route("/delete/:id").delete(verifyToken, postController.deletePost);
 router
   .route("/comment/:id")
