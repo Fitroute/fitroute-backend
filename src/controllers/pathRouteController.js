@@ -7,6 +7,9 @@ const {
   findOne,
 } = require("../services/pathRouteService");
 
+const image = require("../services/imageService");
+const { createFolder } = require("../utils/helper");
+
 //name
 //description - not required
 //start
@@ -131,6 +134,34 @@ const getPathRoute = async (req, res) => {
     });
 };
 
+const uploadImages = async (req, res) => {
+  if (!req.files.images) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      message: "Upload failed",
+      error: "Image is required",
+    });
+    return;
+  }
+  const dir = `src/uploads/routes/${req.params.id}`;
+  createFolder(dir);
+  image.multipleImageUpload(dir, req.files.images).then((images) => {
+    update(req.params.id, {
+      images: images.map((image) => image.name),
+    })
+      .then((images) => {
+        res.status(httpStatus.OK).json({
+          message: "Images uploaded successfully",
+        });
+      })
+      .catch((err) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+          message: "Upload failed",
+          error: err,
+        });
+      });
+  });
+};
+
 const createComment = async (req, res) => {
   findOne({ _id: req.params.id }).then((pathRoute) => {
     if (!pathRoute) {
@@ -185,6 +216,7 @@ module.exports = {
   getPathRoute,
   getAllPathRoutes,
   getPathRoutesByCategory,
+  uploadImages,
   createComment,
   deleteComment,
 };

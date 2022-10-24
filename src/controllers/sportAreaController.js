@@ -6,6 +6,8 @@ const {
   removeArea,
   findOne,
 } = require("../services/sportAreaService");
+const image = require("../services/imageService");
+const { createFolder } = require("../utils/helper");
 
 //createdBy - user id
 //name
@@ -64,6 +66,34 @@ const getAreasByCategory = async (req, res) => {
         error: err,
       });
     });
+};
+
+const uploadImages = async (req, res) => {
+  if (!req.files.images) {
+    res.status(httpStatus.BAD_REQUEST).json({
+      message: "Upload failed",
+      error: "Image is required",
+    });
+    return;
+  }
+  const dir = `src/uploads/areas/${req.params.id}`;
+  createFolder(dir);
+  image.multipleImageUpload(dir, req.files.images).then((images) => {
+    update(req.params.id, {
+      images: images.map((image) => image.name),
+    })
+      .then((images) => {
+        res.status(httpStatus.OK).json({
+          message: "Images uploaded successfully",
+        });
+      })
+      .catch((err) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+          message: "Upload failed",
+          error: err,
+        });
+      });
+  });
 };
 
 const createArea = async (req, res) => {
@@ -178,6 +208,7 @@ module.exports = {
   getAllAreas,
   getAreasByCategory,
   getArea,
+  uploadImages,
   updateArea,
   deleteArea,
   createComment,
