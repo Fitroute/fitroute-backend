@@ -12,6 +12,9 @@ router
 
 router.route("/:id").get(verifyToken, sportAreaController.getArea);
 router
+  .route("/upload-images/:id")
+  .post(verifyToken, sportAreaController.uploadImages);
+router
   .route("/create")
   .post(
     verifyToken,
