@@ -2,7 +2,8 @@ class ImageService {
   singleImageUpload = async (imagePath, image) => {
     image.mv(imagePath, (err) => {
       if (err) {
-        return res.status(status.INTERNAL_SERVER_ERROR).json({ error: err });
+        console.log(err);
+        return;
       }
     });
     return image;

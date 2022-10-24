@@ -14,12 +14,14 @@ const {
 const postService = require("../services/postService");
 const areaService = require("../services/sportAreaService");
 const pathService = require("../services/pathRouteService");
+const image = require("../services/imageService");
 const {
   generateAccessToken,
   generateRefreshToken,
   passwordHash,
   passwordCompare,
   sendMail,
+  createFolder,
 } = require("../utils/helper");
 
 const uploadImage = async (req, res) => {
@@ -30,29 +32,31 @@ const uploadImage = async (req, res) => {
     });
     return;
   }
-  const fileExtension = path.extname(req.files.image.name);
-  const fileName = `${req.user._id}${fileExtension}`;
-  console.log(fileName);
-  const folderPath = path.join(__dirname, "../", "uploads/users", fileName);
-
-  req.files.image.mv(folderPath, (err) => {
-    if (err) {
-      return res.status(status.INTERNAL_SERVER_ERROR).json({ error: err });
-    }
-    update(req.user._id, { image: fileName })
-      .then((user) => {
-        res.status(status.OK).json({
-          message: "Upload successfully",
-          user,
+  const dir = "src/uploads/users/";
+  createFolder(dir);
+  const fileName = `${req.user._id}${path.extname(req.files.image.name)}`;
+  image
+    .singleImageUpload(`${dir}/${fileName}`, req.files.image)
+    .then((_) => {
+      update(req.user._id, { image: fileName })
+        .then((user) => {
+          res.status(status.OK).json({
+            message: "Upload successfully",
+          });
+        })
+        .catch((e) => {
+          res.status(status.INTERNAL_SERVER_ERROR).json({
+            message: "Upload success but update failed",
+            error: e.message,
+          });
         });
-      })
-      .catch((e) => {
-        res.status(status.INTERNAL_SERVER_ERROR).json({
-          message: "Upload success but update failed",
-          error: e.message,
-        });
+    })
+    .catch((e) => {
+      res.status(status.BAD_REQUEST).json({
+        message: "Upload failed",
+        error: e.message,
       });
-  });
+    });
 };
 
 const getBMI = async (req, res) => {
