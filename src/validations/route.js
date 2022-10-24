@@ -19,14 +19,14 @@ const createValidation = Joi.object({
 });
 
 const updateValidation = Joi.object({
-  name: Joi.string().min(3).required(),
+  name: Joi.string().min(3),
   description: Joi.string().min(3),
-  start: Joi.date().required(),
+  start: Joi.date(),
   end: Joi.date(),
   length: Joi.number(),
-  pin: Joi.array().required(),
-  isPrivate: Joi.boolean().required(),
-  category: Joi.string().min(3).required(),
+  pin: Joi.array(),
+  isPrivate: Joi.boolean(),
+  category: Joi.string().min(3),
   images: Joi.array(),
 });
 
