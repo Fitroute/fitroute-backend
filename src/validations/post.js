@@ -13,8 +13,8 @@ const createValidation = Joi.object({
 });
 
 const updateValidation = Joi.object({
-  title: Joi.string().min(3).required(),
-  bodyText: Joi.string().min(3).required(),
+  title: Joi.string().min(3),
+  bodyText: Joi.string().min(3),
   images: Joi.array(),
 });
 
