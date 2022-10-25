@@ -16,7 +16,8 @@ const passwordCompare = (password, hash) => {
   return bcrypt.compareSync(password, hash);
 };
 
-const sendMail = ({ email, subject, username, message }) => {
+const sendMail = ({ email, subject, username, message, emailType }) => {
+  // emailType: file name in utils/views
   var transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE,
     auth: {
@@ -41,7 +42,7 @@ const sendMail = ({ email, subject, username, message }) => {
     from: process.env.EMAIL_FROM,
     to: email,
     subject: subject,
-    template: "email",
+    template: emailType,
     context: {
       name: username,
       code: message,
