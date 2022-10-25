@@ -39,5 +39,7 @@ router
 router
   .route("/comment/:id/:commentId")
   .delete(verifyToken, sportAreaController.deleteComment);
-
+router
+  .route("/comment/update/:id/:commentId")
+  .patch(verifyToken, sportAreaController.updateComment);
 module.exports = router;

@@ -40,4 +40,7 @@ router
 router
   .route("/comment/:id/:commentId")
   .delete(verifyToken, pathRouteController.deleteComment);
+router
+  .route("/comment/update/:id/:commentId")
+  .patch(verifyToken, pathRouteController.updateComment);
 module.exports = router;

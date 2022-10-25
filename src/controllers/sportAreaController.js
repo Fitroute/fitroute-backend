@@ -203,6 +203,35 @@ const deleteComment = async (req, res) => {
   });
 };
 
+const updateComment = async (req, res) => {
+  findOne({ _id: req.params.id }).then((area) => {
+    if (!area) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Area not found",
+      });
+      return;
+    }
+    let comment = area.comments.find(
+      (comment) => comment._id == req.params.commentId
+    );
+    if (!comment) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Comment not found",
+      });
+      return;
+    }
+    comment = Object.assign(comment, req.body);
+    comment.commented_at = new Date();
+    // comment._doc = { ...comment._doc, ...req.body };
+    area.save().then((commentedArea) => {
+      res.status(httpStatus.OK).json({
+        message: "Comment updated successfully",
+        commentedArea,
+      });
+    });
+  });
+};
+
 module.exports = {
   createArea,
   getAllAreas,
@@ -213,4 +242,5 @@ module.exports = {
   deleteArea,
   createComment,
   deleteComment,
+  updateComment,
 };
