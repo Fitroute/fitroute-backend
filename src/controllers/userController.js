@@ -5,6 +5,7 @@ const {
   insert,
   checkUser,
   list,
+  checkUserByID,
   updateWithEmail,
   update,
   removeUser,
@@ -101,7 +102,7 @@ const getBMI = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  await checkUser(req.body.email).then((user) => {
+  await checkUser({ email: req.body.email }).then((user) => {
     if (user) {
       res.status(status.BAD_REQUEST).json({
         message: "Update failed",
@@ -122,7 +123,7 @@ const updateUser = async (req, res) => {
 };
 
 const sendCode = async (req, res) => {
-  checkUser(req.body.email).then((user) => {
+  checkUser({ email: req.body.email }).then((user) => {
     if (!user) {
       res.status(status.BAD_REQUEST).json({
         message: "Send code failed",
@@ -148,8 +149,40 @@ const sendCode = async (req, res) => {
   });
 };
 
+const verifyEmail = async (req, res) => {
+  await checkUserByID(req.params.id)
+    .then((user) => {
+      if (!user) {
+        res.status(status.BAD_REQUEST).json({
+          message: "Invalid link",
+        });
+        return;
+      }
+      checkUser({ verifyLink: req.params.token }).then((token) => {
+        if (!token) {
+          res.status(status.BAD_REQUEST).json({
+            message: "Invalid link",
+          });
+          return;
+        }
+        update(user._id, { isConfirmed: true }).then((response) => {
+          res.status(status.OK).json({
+            message: "Email verified succesfully",
+            response,
+          });
+        });
+      });
+    })
+    .catch((err) => {
+      res.status(status.INTERNAL_SERVER_ERROR).json({
+        message: "Invalid link",
+        error: err,
+      });
+    });
+};
+
 const resetPassword = async (req, res) => {
-  checkUser(req.body.email).then((user) => {
+  checkUser({ email: req.body.email }).then((user) => {
     if (!user) {
       res.status(status.BAD_REQUEST).json({
         message: "Reset password failed",
@@ -180,7 +213,7 @@ const resetPassword = async (req, res) => {
 
 const changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
-  await checkUser(req.user?.email).then((user) => {
+  await checkUser({ email: req.user?.email }).then((user) => {
     const isValid = passwordCompare(oldPassword, user.password);
     if (!isValid) {
       res.status(status.BAD_REQUEST).json({
@@ -215,7 +248,7 @@ const deleteUser = async (req, res) => {
 };
 
 const register = async (req, res) => {
-  await checkUser(req.body.email).then((user) => {
+  await checkUser({ email: req.body.email }).then((user) => {
     if (user) {
       res.status(status.BAD_REQUEST).json({
         message: "Registration failed",
@@ -223,13 +256,28 @@ const register = async (req, res) => {
       });
       return;
     } else {
-      //Password Hashing
+      // Password Hashing
       req.body.password = passwordHash(req.body.password);
       insert(req.body)
         .then((response) => {
-          res.status(status.CREATED).json({
-            message: "User registered successfully",
-            user: response,
+          // Send Verify Email
+          const token = uuid.v4();
+          const link = `${process.env.BASE_URL}/users/verify/${response._id}/${token}`;
+
+          updateWithEmail(
+            { email: req.body.email },
+            { verifyLink: token }
+          ).then((user) => {
+            sendMail({
+              email: req.body.email,
+              subject: "Verify Email",
+              username: user.name,
+              message: link, // email verify template will create
+            });
+            res.status(status.CREATED).json({
+              message: "User registered successfully, please check your email!",
+              user: user,
+            });
           });
         })
         .catch((e) => {
@@ -244,8 +292,16 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  await checkUser(email)
+  await checkUser({ email: email })
     .then((user) => {
+      // Check Users Confirmed
+      if (!user.isConfirmed) {
+        res.status(status.BAD_REQUEST).json({
+          message: "Please check your email to login",
+          error: "Email does not verified",
+        });
+        return;
+      }
       // Checks users password
       const isValid = passwordCompare(password, user.password);
       if (!isValid) {
@@ -347,6 +403,7 @@ module.exports = {
   getAreaList,
   getAllPathRoutesByCreatedBy,
   sendCode,
+  verifyEmail,
   resetPassword,
   changePassword,
   updateUser,

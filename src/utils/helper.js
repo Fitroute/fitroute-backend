@@ -5,7 +5,6 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const fs = require("fs");
 
-
 const passwordHash = (password) => {
   //Password Hashing
   const salt = bcrypt.genSaltSync(10);

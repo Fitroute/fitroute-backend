@@ -5,8 +5,12 @@ const insert = (data) => {
   return user.save();
 };
 
-const checkUser = (email) => {
-  return User.findOne({ email });
+const checkUser = (data) => {
+  return User.findOne( data );
+};
+
+const checkUserByID = (where) => {
+  return User.findById(where);
 };
 
 const list = (where) => {
@@ -37,6 +41,7 @@ module.exports = {
   insert,
   checkUser,
   list,
+  checkUserByID,
   updateWithEmail,
   update,
   removeUser,
