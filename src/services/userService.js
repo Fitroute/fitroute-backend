@@ -6,7 +6,7 @@ const insert = (data) => {
 };
 
 const checkUser = (data) => {
-  return User.findOne( data );
+  return User.findOne(data);
 };
 
 const checkUserByID = (where) => {
@@ -21,12 +21,8 @@ const updateWithEmail = (where, data) => {
   return User.findOneAndUpdate(where, data, { new: true });
 };
 
-const removeResetCode = (email) => {
-  return User.findOneAndUpdate(
-    { email },
-    { $unset: { resetCode: "" } },
-    { new: true }
-  );
+const removeFromDB = (email, data) => {
+  return User.findOneAndUpdate({ email }, { $unset: data }, { new: true });
 };
 
 const update = (id, data) => {
@@ -45,5 +41,5 @@ module.exports = {
   updateWithEmail,
   update,
   removeUser,
-  removeResetCode,
+  removeFromDB,
 };

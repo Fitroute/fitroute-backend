@@ -9,7 +9,7 @@ const {
   updateWithEmail,
   update,
   removeUser,
-  removeResetCode,
+  removeFromDB,
 } = require("../services/userService");
 
 const postService = require("../services/postService");
@@ -167,9 +167,11 @@ const verifyEmail = async (req, res) => {
           return;
         }
         update(user._id, { isConfirmed: true }).then((response) => {
-          res.status(status.OK).json({
-            message: "Email verified succesfully",
-            response,
+          removeFromDB(user.email, { verifyLink: "" }).then((response) => {
+            res.status(status.OK).json({
+              message: "Email verified succesfully",
+              response,
+            });
           });
         });
       });
@@ -191,6 +193,8 @@ const resetPassword = async (req, res) => {
       });
       return;
     }
+    //TODO Date.now - user.updatedAt > 5 minutes olarak ayarlanacak
+    //TODO kodun süresi dolmuşsa hata döndürülecek süresi dolan kodu dbden silinecek
     if (user.resetCode !== req.body.code) {
       res.status(status.BAD_REQUEST).json({
         message: "Reset password failed",
@@ -202,7 +206,7 @@ const resetPassword = async (req, res) => {
       { email: req.body.email },
       { password: passwordHash(req.body.password) }
     ).then((response) => {
-      removeResetCode(req.body.email).then((response) => {
+      removeFromDB(req.body.email, { resetCode: "" }).then((response) => {
         res.status(status.OK).json({
           message: "Reset password successfully",
           response,
