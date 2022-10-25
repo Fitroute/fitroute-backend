@@ -200,6 +200,35 @@ const deleteComment = async (req, res) => {
   });
 };
 
+const updateComment = async (req, res) => {
+  findOne({ _id: req.params.id }).then((post) => {
+    if (!post) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Post not found",
+      });
+      return;
+    }
+    let comment = post.comments.find(
+      (comment) => comment._id == req.params.commentId
+    );
+    if (!comment) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Comment not found",
+      });
+      return;
+    }
+    comment = Object.assign(comment, req.body);
+    comment.commented_at = new Date();
+    // comment._doc = { ...comment._doc, ...req.body };
+    post.save().then((commentedPost) => {
+      res.status(httpStatus.OK).json({
+        message: "Comment updated successfully",
+        commentedPost,
+      });
+    });
+  });
+};
+
 module.exports = {
   uploadImages,
   createPost,
@@ -210,4 +239,5 @@ module.exports = {
   deletePost,
   createComment,
   deleteComment,
+  updateComment,
 };
