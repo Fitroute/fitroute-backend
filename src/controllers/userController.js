@@ -139,6 +139,7 @@ const sendCode = async (req, res) => {
           subject: "Verify code",
           username: user.name,
           message: code,
+          emailType: "resetPassword",
         });
         res.status(status.OK).json({
           message: "Send code successfully",
@@ -273,6 +274,7 @@ const register = async (req, res) => {
               subject: "Verify Email",
               username: user.name,
               message: link, // email verify template will create
+              emailType: "emailVerification", // file name in utils/views
             });
             res.status(status.CREATED).json({
               message: "User registered successfully, please check your email!",
