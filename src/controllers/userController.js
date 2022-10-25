@@ -195,6 +195,17 @@ const resetPassword = async (req, res) => {
     }
     //TODO Date.now - user.updatedAt > 5 minutes olarak ayarlanacak
     //TODO kodun süresi dolmuşsa hata döndürülecek süresi dolan kodu dbden silinecek
+    const unixtimeAdd5Minutes = user.updatedAt.getTime() + 5 * 60 * 1000;
+    if (unixtimeAdd5Minutes < new Date().getTime()) {
+      removeFromDB(user.email, { resetCode: "" }).then((response) => {
+        res.status(status.BAD_REQUEST).json({
+          message: "Reset password failed",
+          error: "Code expired",
+        });
+      });
+      return;
+    }
+
     if (user.resetCode !== req.body.code) {
       res.status(status.BAD_REQUEST).json({
         message: "Reset password failed",
