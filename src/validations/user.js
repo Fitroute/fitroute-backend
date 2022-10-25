@@ -21,7 +21,6 @@ const registerValidation = Joi.object({
 const updateValidation = Joi.object({
   name: Joi.string().min(3),
   surname: Joi.string().min(3),
-  email: Joi.string().email(),
   country: Joi.string(),
   city: Joi.string(),
   height: Joi.number(),
