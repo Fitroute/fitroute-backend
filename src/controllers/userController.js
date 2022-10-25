@@ -136,7 +136,7 @@ const sendCode = async (req, res) => {
       (response) => {
         sendMail({
           email: req.body.email,
-          subject: "Verify code",
+          subject: "Verify Code",
           username: user.name,
           message: code,
           emailType: "resetPassword",
