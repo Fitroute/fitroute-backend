@@ -38,5 +38,8 @@ router
 router
   .route("/comment/:id/:commentId")
   .delete(verifyToken, postController.deleteComment);
+router
+  .route("/comment/update/:id/:commentId")
+  .patch(verifyToken, postController.updateComment);
 
 module.exports = router;
