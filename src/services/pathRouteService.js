@@ -6,11 +6,19 @@ const insert = (data) => {
 };
 
 const list = (where) => {
-  return PathRoute.find(where).populate({
-    //postModel de userı ref ettiğimiz için bu alanları getirebiliriz
-    path: "createdBy",
-    select: "name surname",
-  });
+  return PathRoute.find(where)
+    .populate({
+      //postModel de userı ref ettiğimiz için bu alanları getirebiliriz
+      path: "createdBy",
+      select: "name surname image",
+    })
+    .populate({
+      path: "comments",
+      populate: {
+        path: "createdBy",
+        select: "name surname image",
+      },
+    });
 };
 
 const findOne = (where) => {

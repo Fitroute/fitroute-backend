@@ -7,11 +7,19 @@ const insert = (data) => {
 
 const list = (where) => {
   // populate ile createdBy altında bize dönmesini istediğimiz alanları belirtiyoruz
-  return Post.find(where).populate({
-    //postModel de userı ref ettiğimiz için bu alanları getirebiliriz
-    path: "createdBy",
-    select: "name surname",
-  });
+  return Post.find(where)
+    .populate({
+      //postModel de userı ref ettiğimiz için bu alanları getirebiliriz
+      path: "createdBy",
+      select: "name surname image",
+    })
+    .populate({
+      path: "comments",
+      populate: {
+        path: "createdBy",
+        select: "name surname image",
+      },
+    });
 };
 
 const findOne = (where) => {
