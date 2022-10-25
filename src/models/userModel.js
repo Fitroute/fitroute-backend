@@ -35,11 +35,21 @@ const Schema = mongoose.Schema(
       type: Number,
       required: false,
     },
+    isConfirmed: {
+      // for activation
+      type: Boolean,
+      default: false,
+      required: true,
+    },
     image: {
       type: String,
       required: false,
     },
     resetCode: {
+      type: String,
+      required: false,
+    },
+    verifyLink: {
       type: String,
       required: false,
     },

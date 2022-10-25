@@ -24,11 +24,13 @@ router
 router
   .route("/register")
   .post(validate(schemas.registerValidation), userController.register);
+router.route("/verify/:id/:token").get(userController.verifyEmail);
 router
   .route("/login")
   .post(validate(schemas.loginValidation), userController.login);
 router.route("/posts").get(verifyToken, userController.getPostList);
 router.route("/areas").get(verifyToken, userController.getAreaList);
+
 router
   .route("/pathRoutes")
   .get(verifyToken, userController.getAllPathRoutesByCreatedBy);
