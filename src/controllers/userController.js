@@ -278,7 +278,7 @@ const register = async (req, res) => {
         .then((response) => {
           // Send Verify Email
           const token = uuid.v4();
-          const link = `${process.env.BASE_URL}/users/verify/${response._id}/${token}`;
+          const link = `http://${process.env.BASE_URL}:${process.env.SERVER_PORT}/users/verify/${response._id}/${token}`;
 
           updateWithEmail(
             { email: req.body.email },
