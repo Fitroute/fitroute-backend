@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 mongoose
   .connect(
-    `mongodb://${process.env.BASE_URL}:${process.env.MONGO_PORT}/${process.env.MONGO_DBNAME}`,
+    `mongodb://${process.env.MONGO_URL}:${process.env.MONGO_PORT}/${process.env.MONGO_DBNAME}`,
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
