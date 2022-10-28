@@ -43,6 +43,7 @@ const uploadImage = async (req, res) => {
         .then((user) => {
           res.status(status.OK).json({
             message: "Upload successfully",
+            user,
           });
         })
         .catch((e) => {
