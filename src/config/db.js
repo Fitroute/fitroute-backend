@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-
 mongoose
   .connect(
-    `mongodb://${process.env.MONGO_URL}:${process.env.MONGO_PORT}/${process.env.MONGO_DBNAME}`,
+    `mongodb+srv://${process.env.MONGO_USER_NAME}:${process.env.MONGO_USER_PASSWORD}${process.env.MONGO_URI}`,
     {
+      dbName: process.env.MONGO_DB_NAME,
       useNewUrlParser: true,
       useUnifiedTopology: true,
     }
