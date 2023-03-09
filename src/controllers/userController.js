@@ -133,7 +133,7 @@ const sendCode = async (req, res) => {
       return;
     }
     // const code = uuid.v4()?.split("-")[0] || `fit-${new Date().getTime()}`;
-    const code = Math.floor(Math.random() * (9999 - 1000)) + 1000;
+    const code = `${Math.floor(Math.random() * (9999 - 1000)) + 1000}`;
     updateWithEmail({ email: req.body.email }, { resetCode: code }).then(
       (response) => {
         sendMail({
