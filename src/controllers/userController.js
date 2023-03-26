@@ -370,6 +370,22 @@ const getAllUsers = async (req, res) => {
     });
 };
 
+const getUser = async (req, res) => {
+  await checkUserByID({ _id: req.user?._id })
+    .then((user) => {
+      res.status(status.OK).json({
+        message: "User retrieved successfully",
+        user,
+      });
+    })
+    .catch((e) => {
+      res.status(status.INTERNAL_SERVER_ERROR).json({
+        message: "An error occurred",
+        error: e.message,
+      });
+    });
+};
+
 const getPostList = async (req, res) => {
   postService
     .list({ createdBy: req.user?._id })
@@ -418,6 +434,7 @@ module.exports = {
   login,
   getBMI,
   getAllUsers,
+  getUser,
   getPostList,
   getAreaList,
   getAllPathRoutesByCreatedBy,
