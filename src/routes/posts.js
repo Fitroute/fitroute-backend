@@ -42,4 +42,9 @@ router
   .route("/comment/update/:id/:commentId")
   .patch(verifyToken, postController.updateComment);
 
+router.route("/like/:id").post(verifyToken, postController.createLikes);
+router
+  .route("/like/:id/:likeId")
+  .delete(verifyToken, postController.deleteLikes);
+
 module.exports = router;

@@ -176,6 +176,11 @@ const createComment = async (req, res) => {
       createdBy: req.user,
     };
     pathRoute.comments.push(comment);
+    const totalScore = pathRoute.comments.reduce((acc, comment) => {
+      return acc + comment.score;
+    }, 0);
+    const averageScore = totalScore / pathRoute.comments.length;
+    pathRoute.averageScore = averageScore.toFixed(2);
     pathRoute
       .save()
       .then((commentedRoute) => {
@@ -200,6 +205,11 @@ const deleteComment = async (req, res) => {
     pathRoute.comments = pathRoute.comments.filter(
       (comment) => comment._id != req.params.commentId
     );
+    const totalScore = pathRoute.comments.reduce((acc, comment) => {
+      return acc + comment.score;
+    }, 0);
+    const averageScore = totalScore / pathRoute.comments.length;
+    pathRoute.averageScore = averageScore.toFixed(2);
     pathRoute.save().then((commentedRoute) => {
       res.status(httpStatus.OK).json({
         message: "Comment deleted successfully",
@@ -229,6 +239,11 @@ const updateComment = async (req, res) => {
     comment = Object.assign(comment, req.body);
     comment.commented_at = new Date();
     // comment._doc = { ...comment._doc, ...req.body };
+    const totalScore = pathRoute.comments.reduce((acc, comment) => {
+      return acc + comment.score;
+    }, 0);
+    const averageScore = totalScore / pathRoute.comments.length;
+    pathRoute.averageScore = averageScore.toFixed(2);
     pathRoute.save().then((commentedRoute) => {
       res.status(httpStatus.OK).json({
         message: "Comment updated successfully",

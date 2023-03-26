@@ -166,6 +166,11 @@ const createComment = async (req, res) => {
       createdBy: req.user,
     };
     post.comments.push(comment);
+    const totalScore = post.comments.reduce((acc, comment) => {
+      return acc + comment.score;
+    }, 0);
+    const averageScore = totalScore / post.comments.length;
+    post.averageScore = averageScore.toFixed(2);
     post
       .save()
       .then((commentedPost) => {
@@ -191,6 +196,11 @@ const deleteComment = async (req, res) => {
     post.comments = post.comments.filter(
       (comment) => comment._id != req.params.commentId
     );
+    const totalScore = post.comments.reduce((acc, comment) => {
+      return acc + comment.score;
+    }, 0);
+    const averageScore = totalScore / post.comments.length;
+    post.averageScore = averageScore.toFixed(2);
     post.save().then((commentedPost) => {
       res.status(httpStatus.OK).json({
         message: "Comment deleted successfully",
@@ -220,10 +230,60 @@ const updateComment = async (req, res) => {
     comment = Object.assign(comment, req.body);
     comment.commented_at = new Date();
     // comment._doc = { ...comment._doc, ...req.body };
+    const totalScore = post.comments.reduce((acc, comment) => {
+      return acc + comment.score;
+    }, 0);
+    const averageScore = totalScore / post.comments.length;
+    post.averageScore = averageScore.toFixed(2);
     post.save().then((commentedPost) => {
       res.status(httpStatus.OK).json({
         message: "Comment updated successfully",
         commentedPost,
+      });
+    });
+  });
+};
+
+const createLikes = async (req, res) => {
+  findOne({ _id: req.params.id }).then((post) => {
+    if (!post) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Post not found",
+      });
+      return;
+    }
+    const like = { createdBy: req.user };
+
+    post.likes.push(like);
+    post.likesCount = post.likes.length;
+    post
+      .save()
+      .then((likedPost) => {
+        res.status(httpStatus.OK).json({
+          message: "Like created successfully",
+          likedPost,
+        });
+      })
+      .catch((err) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      });
+  });
+};
+
+const deleteLikes = async (req, res) => {
+  findOne({ _id: req.params.id }).then((post) => {
+    if (!post) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Post not found",
+      });
+      return;
+    }
+    post.likes = post.likes.filter((like) => like._id != req.params.likeId);
+    post.likesCount = post.likes.length;
+    post.save().then((likedPost) => {
+      res.status(httpStatus.OK).json({
+        message: "Like deleted successfully",
+        likedPost,
       });
     });
   });
@@ -235,6 +295,8 @@ module.exports = {
   getPost,
   getPostByTitle,
   getAllPosts,
+  createLikes,
+  deleteLikes,
   updatePost,
   deletePost,
   createComment,

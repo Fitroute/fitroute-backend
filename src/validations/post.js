@@ -9,12 +9,16 @@ const commentValidation = Joi.object({
 const createValidation = Joi.object({
   title: Joi.string().min(3).required(),
   bodyText: Joi.string().min(3).required(),
+  hasComment: Joi.boolean(),
+  isPublic: Joi.boolean(),
   images: Joi.array(),
 });
 
 const updateValidation = Joi.object({
   title: Joi.string().min(3),
   bodyText: Joi.string().min(3),
+  hasComment: Joi.boolean(),
+  isPublic: Joi.boolean(),
   images: Joi.array(),
 });
 
