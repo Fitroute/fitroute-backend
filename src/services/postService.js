@@ -19,6 +19,13 @@ const list = (where) => {
         path: "createdBy",
         select: "name surname image",
       },
+    })
+    .populate({
+      path: "likes",
+      populate: {
+        path: "createdBy",
+        select: "name surname image",
+      },
     });
 };
 

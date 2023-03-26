@@ -30,6 +30,7 @@ router
   .post(validate(schemas.loginValidation), userController.login);
 router.route("/posts").get(verifyToken, userController.getPostList);
 router.route("/areas").get(verifyToken, userController.getAreaList);
+router.route("/fetch").get(verifyToken, userController.getUser);
 
 router
   .route("/pathRoutes")

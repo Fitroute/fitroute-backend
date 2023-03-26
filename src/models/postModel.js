@@ -13,6 +13,31 @@ const Schema = mongoose.Schema(
       type: String,
       required: true,
     },
+    hasComment: {
+      type: Boolean,
+      default: true,
+      required: false,
+    },
+    isPublic: {
+      type: Boolean,
+      default: true,
+      required: false,
+    },
+    averageScore: {
+      type: Number,
+      default: 0,
+      required: false,
+    },
+    likesCount: {
+      type: Number,
+      default: 0,
+      required: false,
+    },
+    likes: [
+      {
+        createdBy: { type: mongoose.Types.ObjectId, ref: "users" },
+      },
+    ],
     images: [{ type: String }],
     comments: [
       {

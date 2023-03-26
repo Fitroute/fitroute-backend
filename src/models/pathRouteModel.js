@@ -38,6 +38,11 @@ const Schema = mongoose.Schema(
       required: true,
     },
     images: [{ type: String }],
+    averageScore: {
+      type: Number,
+      default: 0,
+      required: false,
+    },
     comments: [
       {
         comment: String,
