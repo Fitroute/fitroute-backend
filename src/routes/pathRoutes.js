@@ -27,9 +27,9 @@ router.route("/:id").get(verifyToken, pathRouteController.getPathRoute);
 router
   .route("/filter/:category")
   .get(verifyToken, pathRouteController.getPathRoutesByCategory);
-router
-  .route("/upload-images/:id")
-  .post(verifyToken, pathRouteController.uploadImages);
+// router
+//   .route("/upload-images/:id")
+//   .post(verifyToken, pathRouteController.uploadImages);
 router
   .route("/comment/:id")
   .post(

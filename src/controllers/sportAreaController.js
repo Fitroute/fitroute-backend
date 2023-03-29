@@ -6,7 +6,7 @@ const {
   removeArea,
   findOne,
 } = require("../services/sportAreaService");
-const image = require("../services/imageService");
+// const image = require("../services/imageService");
 const { createFolder } = require("../utils/helper");
 
 //createdBy - user id
@@ -68,33 +68,34 @@ const getAreasByCategory = async (req, res) => {
     });
 };
 
-const uploadImages = async (req, res) => {
-  if (!req.files.images) {
-    res.status(httpStatus.BAD_REQUEST).json({
-      message: "Upload failed",
-      error: "Image is required",
-    });
-    return;
-  }
-  const dir = `src/uploads/areas/${req.params.id}`;
-  createFolder(dir);
-  image.multipleImageUpload(dir, req.files.images).then((images) => {
-    update(req.params.id, {
-      images: images.map((image) => image.name),
-    })
-      .then((images) => {
-        res.status(httpStatus.OK).json({
-          message: "Images uploaded successfully",
-        });
-      })
-      .catch((err) => {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-          message: "Upload failed",
-          error: err,
-        });
-      });
-  });
-};
+///This function is canceled because of the image upload problem we use instead of this base64 for image upload
+// const uploadImages = async (req, res) => {
+//   if (!req.files.images) {
+//     res.status(httpStatus.BAD_REQUEST).json({
+//       message: "Upload failed",
+//       error: "Image is required",
+//     });
+//     return;
+//   }
+//   const dir = `src/uploads/areas/${req.params.id}`;
+//   createFolder(dir);
+//   image.multipleImageUpload(dir, req.files.images).then((images) => {
+//     update(req.params.id, {
+//       images: images.map((image) => image.name),
+//     })
+//       .then((images) => {
+//         res.status(httpStatus.OK).json({
+//           message: "Images uploaded successfully",
+//         });
+//       })
+//       .catch((err) => {
+//         res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+//           message: "Upload failed",
+//           error: err,
+//         });
+//       });
+//   });
+// };
 
 const createArea = async (req, res) => {
   req.body.createdBy = req.user;

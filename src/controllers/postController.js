@@ -7,40 +7,41 @@ const {
   removePost,
   findOne,
 } = require("../services/postService");
-const image = require("../services/imageService");
+// const image = require("../services/imageService");
 const { createFolder } = require("../utils/helper");
 //createdBy - user id
 //title
 //bodyText
 //image - not required
 
-const uploadImages = async (req, res) => {
-  if (!req.files.images) {
-    res.status(httpStatus.BAD_REQUEST).json({
-      message: "Upload failed",
-      error: "Image is required",
-    });
-    return;
-  }
-  const dir = `src/uploads/posts/${req.params.id}`;
-  createFolder(dir);
-  image.multipleImageUpload(dir, req.files.images).then((images) => {
-    update(req.params.id, {
-      images: images.map((image) => image.name),
-    })
-      .then((images) => {
-        res.status(httpStatus.OK).json({
-          message: "Images uploaded successfully",
-        });
-      })
-      .catch((err) => {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-          message: "Upload failed",
-          error: err,
-        });
-      });
-  });
-};
+///This function is canceled because of the image upload problem we use instead of this base64 for image upload
+// const uploadImages = async (req, res) => {
+//   if (!req.files.images) {
+//     res.status(httpStatus.BAD_REQUEST).json({
+//       message: "Upload failed",
+//       error: "Image is required",
+//     });
+//     return;
+//   }
+//   const dir = `src/uploads/posts/${req.params.id}`;
+//   createFolder(dir);
+//   image.multipleImageUpload(dir, req.files.images).then((images) => {
+//     update(req.params.id, {
+//       images: images.map((image) => image.name),
+//     })
+//       .then((images) => {
+//         res.status(httpStatus.OK).json({
+//           message: "Images uploaded successfully",
+//         });
+//       })
+//       .catch((err) => {
+//         res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+//           message: "Upload failed",
+//           error: err,
+//         });
+//       });
+//   });
+// };
 
 // Get Post by ID
 const getPost = async (req, res) => {

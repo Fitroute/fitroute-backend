@@ -11,7 +11,7 @@ const createValidation = Joi.object({
   bodyText: Joi.string().min(3).required(),
   hasComment: Joi.boolean(),
   isPublic: Joi.boolean(),
-  images: Joi.array(),
+  images: Joi.array().items(Joi.string()),
 });
 
 const updateValidation = Joi.object({
@@ -19,7 +19,7 @@ const updateValidation = Joi.object({
   bodyText: Joi.string().min(3),
   hasComment: Joi.boolean(),
   isPublic: Joi.boolean(),
-  images: Joi.array(),
+  images: Joi.array().items(Joi.string()),
 });
 
 module.exports = { commentValidation, createValidation, updateValidation };

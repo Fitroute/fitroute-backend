@@ -10,7 +10,7 @@ const createValidation = Joi.object({
   name: Joi.string().min(3).required(),
   category: Joi.string().min(3).required(),
   location: Joi.string().required(),
-  images: Joi.array(),
+  images: Joi.array().items(Joi.string()),
   description: Joi.string(),
 });
 
@@ -18,7 +18,7 @@ const updateValidation = Joi.object({
   name: Joi.string().min(3),
   category: Joi.string().min(3),
   location: Joi.string(),
-  images: Joi.array(),
+  images: Joi.array().items(Joi.string()),
   description: Joi.string(),
 });
 

@@ -15,7 +15,7 @@ const createValidation = Joi.object({
   pin: Joi.array().required(),
   isPrivate: Joi.boolean().required(),
   category: Joi.string().min(3).required(),
-  images: Joi.array(),
+  images: Joi.array().items(Joi.string()),
 });
 
 const updateValidation = Joi.object({
@@ -27,7 +27,7 @@ const updateValidation = Joi.object({
   pin: Joi.array(),
   isPrivate: Joi.boolean(),
   category: Joi.string().min(3),
-  images: Joi.array(),
+  images: Joi.array().items(Joi.string()),
 });
 
 module.exports = { commentValidation, createValidation, updateValidation };

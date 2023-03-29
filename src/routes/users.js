@@ -6,7 +6,7 @@ const verifyToken = require("../middlewares/verifyToken");
 const schemas = require("../validations/user");
 
 router.route("/").get(userController.getAllUsers);
-router.route("/profile-image").post(verifyToken, userController.uploadImage);
+// router.route("/profile-image").post(verifyToken, userController.uploadImage);
 router
   .route("/send")
   .post(validate(schemas.sendCodeValidation), userController.sendCode);

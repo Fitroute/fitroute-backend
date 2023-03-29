@@ -16,9 +16,9 @@ router
   );
 router.route("/:id").get(verifyToken, postController.getPost);
 router.route("/filter/:title").get(verifyToken, postController.getPostByTitle);
-router
-  .route("/upload-images/:id")
-  .post(verifyToken, postController.uploadImages);
+// router
+//   .route("/upload-images/:id")
+//   .post(verifyToken, postController.uploadImages);
 router
   .route("/update/:id")
   .patch(
