@@ -253,7 +253,7 @@ module.exports = {
   getAllAreas,
   getAreasByCategory,
   getArea,
-  uploadImages,
+  // uploadImages,
   updateArea,
   deleteArea,
   createComment,

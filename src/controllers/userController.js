@@ -445,5 +445,5 @@ module.exports = {
   changePassword,
   updateUser,
   deleteUser,
-  uploadImage,
+  // uploadImage,
 };

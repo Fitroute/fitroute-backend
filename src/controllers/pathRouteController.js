@@ -133,7 +133,9 @@ const getPathRoute = async (req, res) => {
       });
     });
 };
-const uploadImages = async (req, res) => {
+
+///This function is canceled because of the image upload problem we use instead of this base64 for image upload
+// const uploadImages = async (req, res) => {
 //   if (!req.files.images) {
 //     res.status(httpStatus.BAD_REQUEST).json({
 //       message: "Upload failed",
@@ -160,8 +162,7 @@ const uploadImages = async (req, res) => {
 //       });
 //   });
 // };
-///This function is canceled because of the image upload problem we use instead of this base64 for image upload
-//
+
 
 const createComment = async (req, res) => {
   findOne({ _id: req.params.id }).then((pathRoute) => {
@@ -261,7 +262,7 @@ module.exports = {
   getPathRoute,
   getAllPathRoutes,
   getPathRoutesByCategory,
-  uploadImages,
+  // uploadImages,
   createComment,
   deleteComment,
   updateComment,
