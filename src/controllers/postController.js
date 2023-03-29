@@ -291,7 +291,7 @@ const deleteLikes = async (req, res) => {
 };
 
 module.exports = {
-  uploadImages,
+  // uploadImages,
   createPost,
   getPost,
   getPostByTitle,
