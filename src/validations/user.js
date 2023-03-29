@@ -25,6 +25,7 @@ const updateValidation = Joi.object({
   city: Joi.string(),
   height: Joi.number(),
   weight: Joi.number(),
+  image: Joi.string(),
 });
 const changePasswordValidation = Joi.object({
   oldPassword: Joi.string().min(6).required(),
