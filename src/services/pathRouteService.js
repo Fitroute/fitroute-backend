@@ -1,7 +1,7 @@
 const PathRoute = require("../models/pathRouteModel");
 
 const insert = (data) => {
-  const pathRoute = new Post(data);
+  const pathRoute = new PathRoute(data);
   return pathRoute.save();
 };
 
