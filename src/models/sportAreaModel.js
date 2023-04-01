@@ -33,7 +33,7 @@ const Schema = mongoose.Schema(
       required: false,
     },
     location: {
-      type: String,
+      type: Array,
       required: true,
     },
   },

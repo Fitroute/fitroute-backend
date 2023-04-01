@@ -17,7 +17,7 @@ const createValidation = Joi.object({
 const updateValidation = Joi.object({
   name: Joi.string().min(3),
   category: Joi.string().min(3),
-  location: Joi.string(),
+  location: Joi.array(),
   images: Joi.array().items(Joi.string()),
   description: Joi.string(),
 });
