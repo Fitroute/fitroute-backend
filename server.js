@@ -13,7 +13,8 @@ const pathRoutesRouter = require("./src/routes/pathRoutes");
 const sportAreasRouter = require("./src/routes/sportAreas");
 const postsRouter = require("./src/routes/posts");
 //Middleware
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // Cors policy hatasını çözer
 app.use(cors());
 // Helmet paketi ile güvenlik önlemleri alınır
