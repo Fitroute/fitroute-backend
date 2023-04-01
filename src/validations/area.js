@@ -9,7 +9,7 @@ const commentValidation = Joi.object({
 const createValidation = Joi.object({
   name: Joi.string().min(3).required(),
   category: Joi.string().min(3).required(),
-  location: Joi.string().required(),
+  location: Joi.array().required(),
   images: Joi.array().items(Joi.string()),
   description: Joi.string(),
 });
