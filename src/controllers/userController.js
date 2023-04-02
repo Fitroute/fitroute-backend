@@ -417,7 +417,7 @@ const getAreaList = async (req, res) => {
 
 // Get All PathRoute by CreatedBy
 const getAllPathRoutesByCreatedBy = async (req, res) => {
-  pathRouteService
+  pathService
     .list({ createdBy: req.user?._id })
     .then((pathRoutes) => {
       res.status(status.OK).json(pathRoutes);
