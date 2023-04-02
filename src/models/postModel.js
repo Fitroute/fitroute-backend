@@ -5,11 +5,15 @@ const Schema = mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "users",
     },
-    title: {
+    name: {
       type: String,
       required: true,
     },
-    bodyText: {
+    description: {
+      type: String,
+      required: true,
+    },
+    category: {
       type: String,
       required: true,
     },
