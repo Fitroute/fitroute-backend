@@ -3,7 +3,7 @@ const app = express();
 require("dotenv").config();
 const cors = require("cors");
 const helmet = require("helmet");
-const fileUpload = require("express-fileupload");
+// const fileUpload = require("express-fileupload");
 const path = require("path");
 
 //Import Routes
@@ -12,6 +12,7 @@ const usersRouter = require("./src/routes/users");
 const pathRoutesRouter = require("./src/routes/pathRoutes");
 const sportAreasRouter = require("./src/routes/sportAreas");
 const postsRouter = require("./src/routes/posts");
+const searchRouter = require("./src/routes/search");
 //Middleware
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -20,15 +21,15 @@ app.use(cors());
 // Helmet paketi ile güvenlik önlemleri alınır
 app.use(helmet());
 // File upload için middleware
-app.use(fileUpload());
+// app.use(fileUpload());
 
 //Main Route
 app.get("/", (req, res) => {
   res.send("Welcome to fitroute-backend 👋!");
 });
 
-//Static Files
-app.use("/uploads", express.static(path.join(__dirname, "src/uploads")));
+// //Static Files
+// app.use("/uploads", express.static(path.join(__dirname, "src/uploads")));
 
 //Users Route
 app.use("/users", usersRouter);
@@ -41,5 +42,8 @@ app.use("/sportAreas", sportAreasRouter);
 
 //Posts Route
 app.use("/posts", postsRouter);
+
+//Search Route
+app.use("/search", searchRouter);
 
 module.exports = app;

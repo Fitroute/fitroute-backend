@@ -7,16 +7,18 @@ const commentValidation = Joi.object({
 });
 
 const createValidation = Joi.object({
-  title: Joi.string().min(3).required(),
-  bodyText: Joi.string().min(3).required(),
+  name: Joi.string().min(3).required(),
+  description: Joi.string().min(3).required(),
+  category: Joi.string().min(3).required(),
   hasComment: Joi.boolean(),
   isPublic: Joi.boolean(),
   images: Joi.array().items(Joi.string()),
 });
 
 const updateValidation = Joi.object({
-  title: Joi.string().min(3),
-  bodyText: Joi.string().min(3),
+  name: Joi.string().min(3),
+  description: Joi.string().min(3),
+  category: Joi.string().min(3).required(),
   hasComment: Joi.boolean(),
   isPublic: Joi.boolean(),
   images: Joi.array().items(Joi.string()),
