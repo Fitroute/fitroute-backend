@@ -18,6 +18,16 @@ const Schema = mongoose.Schema(
       default: 0,
       required: false,
     },
+    likesCount: {
+      type: Number,
+      default: 0,
+      required: false,
+    },
+    likes: [
+      {
+        createdBy: { type: mongoose.Types.ObjectId, ref: "users" },
+      },
+    ],
     images: [{ type: String }],
     comments: [
       {

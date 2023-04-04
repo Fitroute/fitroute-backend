@@ -248,6 +248,36 @@ const updateComment = async (req, res) => {
   });
 };
 
+const like = async (req, res) => {
+  findOne({ _id: req.params.id }).then((area) => {
+    if (!area) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Area not found",
+      });
+      return;
+    }
+    const userLikedArea = area.likes.some(
+      (like) => like.createdBy == req.user._id
+    );
+    if (userLikedArea) {
+      area.likes = area.likes.filter((like) => like.createdBy != req.user._id);
+      area.likesCount = area.likes.length;
+    } else {
+      const like = { createdBy: req.user };
+      area.likes.unshift(like);
+      area.likesCount = area.likes.length;
+    }
+    area
+      .save()
+      .then((likedArea) => {
+        res.status(httpStatus.OK).json({ likedArea });
+      })
+      .catch((err) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      });
+  });
+};
+
 module.exports = {
   createArea,
   getAllAreas,
@@ -259,4 +289,5 @@ module.exports = {
   createComment,
   deleteComment,
   updateComment,
+  like,
 };

@@ -44,4 +44,5 @@ router
     userController.updateUser
   );
 router.route("/delete").delete(verifyToken, userController.deleteUser);
+router.route("/likes").get(verifyToken, userController.getLikes);
 module.exports = router;

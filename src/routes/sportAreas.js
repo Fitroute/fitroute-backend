@@ -42,4 +42,5 @@ router
 router
   .route("/comment/update/:id/:commentId")
   .patch(verifyToken, sportAreaController.updateComment);
+router.route("/like/:id").post(verifyToken, sportAreaController.like);
 module.exports = router;

@@ -43,4 +43,5 @@ router
 router
   .route("/comment/update/:id/:commentId")
   .patch(verifyToken, pathRouteController.updateComment);
+router.route("/like/:id").post(verifyToken, pathRouteController.like);
 module.exports = router;
