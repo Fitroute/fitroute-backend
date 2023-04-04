@@ -60,7 +60,8 @@ const sendMail = ({ email, subject, username, message, emailType }) => {
 
 const generateAccessToken = (user) => {
   return jwt.sign(
-    { _id: user._id, ...user },
+    // { _id: user._id, ...user },
+    { _id: user._id },
     process.env.ACCESS_TOKEN_SECRET_KEY,
     {
       expiresIn: "1w",
@@ -69,7 +70,8 @@ const generateAccessToken = (user) => {
 };
 const generateRefreshToken = (user) => {
   return jwt.sign(
-    { _id: user._id, ...user },
+    { _id: user._id },
+    // { _id: user._id, ...user },
     process.env.REFRESH_TOKEN_SECRET_KEY
   );
 };
