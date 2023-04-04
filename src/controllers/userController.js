@@ -430,6 +430,25 @@ const getAllPathRoutesByCreatedBy = async (req, res) => {
     });
 };
 
+const getLikes = async (req, res) => {
+  const userId = req.user._id;
+  console.log(userId);
+  Promise.all([
+    postService.list({ "likes.createdBy": userId }),
+    areaService.list({ "likes.createdBy": userId }),
+    pathService.list({ "likes.createdBy": userId }),
+  ]).then((values) => {
+    res.status(status.OK).json({
+      message: "User likes retrieved successfully",
+      userLikes: {
+        postLikes: values[0],
+        areaLikes: values[1],
+        pathRouteLikes: values[2],
+      },
+    });
+  });
+};
+
 module.exports = {
   register,
   login,
@@ -445,5 +464,6 @@ module.exports = {
   changePassword,
   updateUser,
   deleteUser,
+  getLikes,
   // uploadImage,
 };

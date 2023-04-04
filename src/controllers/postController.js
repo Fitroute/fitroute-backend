@@ -245,7 +245,7 @@ const updateComment = async (req, res) => {
   });
 };
 
-const createLikes = async (req, res) => {
+const like = async (req, res) => {
   findOne({ _id: req.params.id }).then((post) => {
     if (!post) {
       res.status(httpStatus.NOT_FOUND).json({
@@ -253,40 +253,25 @@ const createLikes = async (req, res) => {
       });
       return;
     }
-    const like = { createdBy: req.user };
-
-    post.likes.push(like);
-    post.likesCount = post.likes.length;
+    const userLikedPost = post.likes.some(
+      (like) => like.createdBy == req.user._id
+    );
+    if (userLikedPost) {
+      post.likes = post.likes.filter((like) => like.createdBy != req.user._id);
+      post.likesCount = post.likes.length;
+    } else {
+      const like = { createdBy: req.user };
+      post.likes.unshift(like);
+      post.likesCount = post.likes.length;
+    }
     post
       .save()
       .then((likedPost) => {
-        res.status(httpStatus.OK).json({
-          message: "Like created successfully",
-          likedPost,
-        });
+        res.status(httpStatus.OK).json({ likedPost });
       })
       .catch((err) => {
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
       });
-  });
-};
-
-const deleteLikes = async (req, res) => {
-  findOne({ _id: req.params.id }).then((post) => {
-    if (!post) {
-      res.status(httpStatus.NOT_FOUND).json({
-        message: "Post not found",
-      });
-      return;
-    }
-    post.likes = post.likes.filter((like) => like._id != req.params.likeId);
-    post.likesCount = post.likes.length;
-    post.save().then((likedPost) => {
-      res.status(httpStatus.OK).json({
-        message: "Like deleted successfully",
-        likedPost,
-      });
-    });
   });
 };
 
@@ -296,8 +281,7 @@ module.exports = {
   getPost,
   getPostByTitle,
   getAllPosts,
-  createLikes,
-  deleteLikes,
+  like,
   updatePost,
   deletePost,
   createComment,

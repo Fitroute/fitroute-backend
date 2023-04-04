@@ -37,6 +37,16 @@ const Schema = mongoose.Schema(
       type: String,
       required: true,
     },
+    likesCount: {
+      type: Number,
+      default: 0,
+      required: false,
+    },
+    likes: [
+      {
+        createdBy: { type: mongoose.Types.ObjectId, ref: "users" },
+      },
+    ],
     images: [{ type: String }],
     averageScore: {
       type: Number,

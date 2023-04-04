@@ -163,7 +163,6 @@ const getPathRoute = async (req, res) => {
 //   });
 // };
 
-
 const createComment = async (req, res) => {
   findOne({ _id: req.params.id }).then((pathRoute) => {
     if (!pathRoute) {
@@ -255,6 +254,38 @@ const updateComment = async (req, res) => {
   });
 };
 
+const like = async (req, res) => {
+  findOne({ _id: req.params.id }).then((pathRoute) => {
+    if (!pathRoute) {
+      res.status(httpStatus.NOT_FOUND).json({
+        message: "Path Route not found",
+      });
+      return;
+    }
+    const userLikedPathRoute = pathRoute.likes.some(
+      (like) => like.createdBy == req.user._id
+    );
+    if (userLikedPathRoute) {
+      pathRoute.likes = pathRoute.likes.filter(
+        (like) => like.createdBy != req.user._id
+      );
+      pathRoute.likesCount = pathRoute.likes.length;
+    } else {
+      const like = { createdBy: req.user };
+      pathRoute.likes.unshift(like);
+      pathRoute.likesCount = pathRoute.likes.length;
+    }
+    pathRoute
+      .save()
+      .then((likedPathRoute) => {
+        res.status(httpStatus.OK).json({ likedPathRoute });
+      })
+      .catch((err) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      });
+  });
+};
+
 module.exports = {
   createPathRoute,
   updatePathRoute,
@@ -266,4 +297,5 @@ module.exports = {
   createComment,
   deleteComment,
   updateComment,
+  like,
 };
