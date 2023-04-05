@@ -249,33 +249,35 @@ const updateComment = async (req, res) => {
 };
 
 const like = async (req, res) => {
-  findOne({ _id: req.params.id }).then((area) => {
+  try {
+    const areaId = req.params.id;
+    const userId = req.user._id;
+    const area = await findOne({ _id: areaId });
     if (!area) {
-      res.status(httpStatus.NOT_FOUND).json({
+      return res.status(httpStatus.NOT_FOUND).json({
         message: "Area not found",
       });
-      return;
     }
     const userLikedArea = area.likes.some(
-      (like) => like.createdBy == req.user._id
+      (like) => like.createdBy.toString() === userId.toString()
     );
     if (userLikedArea) {
-      area.likes = area.likes.filter((like) => like.createdBy != req.user._id);
-      area.likesCount = area.likes.length;
-    } else {
-      const like = { createdBy: req.user._id };
-      area.likes.unshift(like);
-      area.likesCount = area.likes.length;
-    }
-    area
-      .save()
-      .then((likedArea) => {
-        res.status(httpStatus.OK).json({ likedArea });
-      })
-      .catch((err) => {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      await update(
+        { _id: areaId },
+        { $pull: { likes: { createdBy: userId } }, $inc: { likesCount: -1 } }
+      );
+      return res.status(httpStatus.OK).json({
+        message: "Area dislike successfully",
       });
-  });
+    }
+    await update(
+      { _id: areaId },
+      { $addToSet: { likes: { createdBy: userId } }, $inc: { likesCount: 1 } }
+    );
+    res.status(httpStatus.OK).json({ message: "Area like successfully" });
+  } catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + error);
+  }
 };
 
 module.exports = {
