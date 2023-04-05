@@ -9,6 +9,8 @@ const {
 } = require("../services/postService");
 // const image = require("../services/imageService");
 const { createFolder } = require("../utils/helper");
+const { type } = require("os");
+const { findById } = require("../models/postModel");
 //createdBy - user id
 //title
 //bodyText
@@ -246,33 +248,35 @@ const updateComment = async (req, res) => {
 };
 
 const like = async (req, res) => {
-  findOne({ _id: req.params.id }).then((post) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user._id;
+    const post = await findOne({ _id: postId });
     if (!post) {
-      res.status(httpStatus.NOT_FOUND).json({
+      return res.status(httpStatus.NOT_FOUND).json({
         message: "Post not found",
       });
-      return;
     }
     const userLikedPost = post.likes.some(
-      (like) => like.createdBy == req.user._id
+      (like) => like.createdBy.toString() === userId.toString()
     );
     if (userLikedPost) {
-      post.likes = post.likes.filter((like) => like.createdBy != req.user._id);
-      post.likesCount = post.likes.length;
-    } else {
-      const like = { createdBy: req.user._id };
-      post.likes.unshift(like);
-      post.likesCount = post.likes.length;
-    }
-    post
-      .save()
-      .then((likedPost) => {
-        res.status(httpStatus.OK).json({ likedPost });
-      })
-      .catch((err) => {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      await update(
+        { _id: postId },
+        { $pull: { likes: { createdBy: userId } }, $inc: { likesCount: -1 } }
+      );
+      return res.status(httpStatus.OK).json({
+        message: "Post dislike successfully",
       });
-  });
+    }
+    await update(
+      { _id: postId },
+      { $addToSet: { likes: { createdBy: userId } }, $inc: { likesCount: 1 } }
+    );
+    res.status(httpStatus.OK).json({ message: "Post like successfully" });
+  } catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + error);
+  }
 };
 
 module.exports = {

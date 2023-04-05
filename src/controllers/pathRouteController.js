@@ -255,35 +255,35 @@ const updateComment = async (req, res) => {
 };
 
 const like = async (req, res) => {
-  findOne({ _id: req.params.id }).then((pathRoute) => {
-    if (!pathRoute) {
-      res.status(httpStatus.NOT_FOUND).json({
-        message: "Path Route not found",
+  try {
+    const routeId = req.params.id;
+    const userId = req.user._id;
+    const route = await findOne({ _id: routeId });
+    if (!route) {
+      return res.status(httpStatus.NOT_FOUND).json({
+        message: "Route not found",
       });
-      return;
     }
-    const userLikedPathRoute = pathRoute.likes.some(
-      (like) => like.createdBy == req.user._id
+    const userLikedRoute = route.likes.some(
+      (like) => like.createdBy.toString() === userId.toString()
     );
-    if (userLikedPathRoute) {
-      pathRoute.likes = pathRoute.likes.filter(
-        (like) => like.createdBy != req.user._id
+    if (userLikedRoute) {
+      await update(
+        { _id: routeId },
+        { $pull: { likes: { createdBy: userId } }, $inc: { likesCount: -1 } }
       );
-      pathRoute.likesCount = pathRoute.likes.length;
-    } else {
-      const like = { createdBy: req.user._id };
-      pathRoute.likes.unshift(like);
-      pathRoute.likesCount = pathRoute.likes.length;
-    }
-    pathRoute
-      .save()
-      .then((likedPathRoute) => {
-        res.status(httpStatus.OK).json({ likedPathRoute });
-      })
-      .catch((err) => {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + err);
+      return res.status(httpStatus.OK).json({
+        message: "Route dislike successfully",
       });
-  });
+    }
+    await update(
+      { _id: routeId },
+      { $addToSet: { likes: { createdBy: userId } }, $inc: { likesCount: 1 } }
+    );
+    res.status(httpStatus.OK).json({ message: "Route like successfully" });
+  } catch (error) {
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json("Error: " + error);
+  }
 };
 
 module.exports = {
