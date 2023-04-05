@@ -432,7 +432,6 @@ const getAllPathRoutesByCreatedBy = async (req, res) => {
 
 const getLikes = async (req, res) => {
   const userId = req.user._id;
-  console.log(userId);
   Promise.all([
     postService.list({ "likes.createdBy": userId }),
     areaService.list({ "likes.createdBy": userId }),

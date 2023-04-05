@@ -23,7 +23,7 @@ const { createFolder } = require("../utils/helper");
 
 // Generate PathRoute
 const createPathRoute = async (req, res) => {
-  req.body.createdBy = req.user;
+  req.body.createdBy = req.user._id;
   await insert(req.body)
     .then((pathRoute) => {
       res.status(httpStatus.CREATED).json({
@@ -174,7 +174,7 @@ const createComment = async (req, res) => {
     const comment = {
       ...req.body,
       commented_at: new Date(),
-      createdBy: req.user,
+      createdBy: req.user._id,
     };
     pathRoute.comments.push(comment);
     const totalScore = pathRoute.comments.reduce((acc, comment) => {
@@ -271,7 +271,7 @@ const like = async (req, res) => {
       );
       pathRoute.likesCount = pathRoute.likes.length;
     } else {
-      const like = { createdBy: req.user };
+      const like = { createdBy: req.user._id };
       pathRoute.likes.unshift(like);
       pathRoute.likesCount = pathRoute.likes.length;
     }

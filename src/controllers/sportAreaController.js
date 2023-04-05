@@ -98,7 +98,7 @@ const getAreasByCategory = async (req, res) => {
 // };
 
 const createArea = async (req, res) => {
-  req.body.createdBy = req.user;
+  req.body.createdBy = req.user._id;
   await insert(req.body)
     .then((area) => {
       res.status(httpStatus.CREATED).json({
@@ -167,7 +167,7 @@ const createComment = async (req, res) => {
     const comment = {
       ...req.body,
       commented_at: new Date(),
-      createdBy: req.user,
+      createdBy: req.user._id,
     };
     area.comments.push(comment);
     const totalScore = area.comments.reduce((acc, comment) => {
@@ -263,7 +263,7 @@ const like = async (req, res) => {
       area.likes = area.likes.filter((like) => like.createdBy != req.user._id);
       area.likesCount = area.likes.length;
     } else {
-      const like = { createdBy: req.user };
+      const like = { createdBy: req.user._id };
       area.likes.unshift(like);
       area.likesCount = area.likes.length;
     }
