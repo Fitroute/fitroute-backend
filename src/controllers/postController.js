@@ -94,7 +94,7 @@ const getPostByTitle = async (req, res) => {
 };
 
 const createPost = async (req, res) => {
-  req.body.createdBy = req.user;
+  req.body.createdBy = req.user._id;
   await insert(req.body)
     .then((post) => {
       res.status(httpStatus.CREATED).json({
@@ -164,7 +164,7 @@ const createComment = async (req, res) => {
     const comment = {
       ...req.body,
       commented_at: new Date(),
-      createdBy: req.user,
+      createdBy: req.user._id,
     };
     post.comments.push(comment);
     const totalScore = post.comments.reduce((acc, comment) => {
@@ -260,7 +260,7 @@ const like = async (req, res) => {
       post.likes = post.likes.filter((like) => like.createdBy != req.user._id);
       post.likesCount = post.likes.length;
     } else {
-      const like = { createdBy: req.user };
+      const like = { createdBy: req.user._id };
       post.likes.unshift(like);
       post.likesCount = post.likes.length;
     }

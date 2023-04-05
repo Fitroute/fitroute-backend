@@ -1,7 +1,8 @@
 const httpStatus = require("http-status");
 const jwt = require("jsonwebtoken");
+const userService = require("../services/userService");
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   const bearerHeader = req.header("Authorization");
   if (!bearerHeader) {
     res
@@ -11,14 +12,14 @@ const verifyToken = (req, res, next) => {
   }
   try {
     const token = bearerHeader.split(" ")[1];
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, (err, user) => {
-      if (err) {
-        res.status(httpStatus.UNAUTHORIZED).json({ message: "Invalid Token" });
-        return;
-      }
-      req.user = user?._doc;
-      next();
-    });
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
+    const dbUser = await userService.checkUserByID(decodedToken._id);
+    if (!dbUser) {
+      res.status(httpStatus.UNAUTHORIZED).json({ message: "User not found" });
+      return;
+    }
+    req.user = dbUser;
+    next();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
