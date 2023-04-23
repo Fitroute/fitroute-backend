@@ -35,7 +35,9 @@ router.route("/fetch").get(verifyToken, userController.getUser);
 router
   .route("/pathRoutes")
   .get(verifyToken, userController.getAllPathRoutesByCreatedBy);
-router.route("/bmi").get(verifyToken, userController.getBMI);
+router
+  .route("/bmi")
+  .patch(verifyToken, validate(schemas.bmiValidation), userController.getBMI);
 router
   .route("/update")
   .patch(

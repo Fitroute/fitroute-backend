@@ -63,36 +63,15 @@ const {
 // };
 
 const getBMI = async (req, res) => {
-  list({ _id: req.user?._id })
+  const weight = req.body.weight;
+  const height = req.body.height;
+  const bmi = (weight / ((height * height) / 10000)).toFixed(2);
+  update(req.user?._id, req.body)
     .then((user) => {
-      const bmi = user[0].weight / (user[0].height * user[0].height);
-      let bmiStatus = "Not Calculated";
-      switch (true) {
-        case bmi < 16.0:
-          bmiStatus = "Severely Underweight";
-          break;
-        case bmi < 18.5:
-          bmiStatus = "Underweight";
-          break;
-        case bmi < 25.0:
-          bmiStatus = "Normal";
-          break;
-        case bmi < 30.0:
-          bmiStatus = "Overweight";
-          break;
-        case bmi < 35.0:
-          bmiStatus = "Moderately Obese";
-          break;
-        case bmi < 40.0:
-          bmiStatus = "Severely Obese";
-          break;
-        case bmi > 40.0:
-          bmiStatus = "Morbidly Obese";
-          break;
-      }
       res.status(status.OK).json({
-        message: bmiStatus,
-        bmi,
+        message: "User bmi calculated successfully",
+        user: user,
+        bmi: bmi,
       });
     })
     .catch((e) => {
